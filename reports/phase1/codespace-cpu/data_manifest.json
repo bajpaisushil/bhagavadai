@@ -1,0 +1,53 @@
+{
+  "_meta": {
+    "report": "data_manifest",
+    "run_id": "20261118T085120Z-2873d0",
+    "created_utc": "2026-11-18T08:51:21+00:00",
+    "package_version": "0.1.0",
+    "git": {
+      "commit": "9d8fab7e7127f9551f52dcafa498f4e59a3672ed",
+      "dirty": true
+    }
+  },
+  "sources": [
+    {
+      "id": "gretil-bhagavata-purana",
+      "status": "under_review",
+      "license": "CC BY-NC-SA 4.0 (per-file TEI header, added in GRETIL's 2020 mass conversion)",
+      "usage": {
+        "download": true,
+        "metadata": true
+      },
+      "review": "researched"
+    },
+    {
+      "id": "dcs-bhagavata-purana",
+      "status": "under_review",
+      "license": "CC BY 4.0 (GitHub readme; the website states CC BY 3.0)",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "sa-wikisource-bhagavata-purana",
+      "status": "under_review",
+      "license": "CC BY-SA 4.0 (site footer; 'additional terms may apply')",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "sanskritdocuments-bhagavata-purana",
+      "status": "excluded",
+      "license": "Personal study and research only; AI ingestion prohibited without written permission",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "gaudiya-grantha-mandira-bhagavata",
+      "status": "excluded",
+      "license": "All rights reserved (site footer); no open licence",
+      "usage": {},
+      "review": "researched"
+    }
+  ],
+  "updated": "2026-11-18"
+}

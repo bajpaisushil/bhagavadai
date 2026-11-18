@@ -1,0 +1,25 @@
+# Pipeline validation on a CPU-only machine (CI, codespaces). Not a performance measurement.
+hardware_check:
+  device: cpu
+  seed: 1234
+  mps_memory_fraction: null
+  op_checks:
+    enabled: true
+    dtypes: [float32, bfloat16]
+  numerics:
+    compare_with_cpu_reference: false
+  generation:
+    max_new_tokens: 8
+  training:
+    enabled: true
+    seq_lens: [64, 128]
+    batch_size: 1
+    warmup_steps: 0
+    measured_steps: 1
+    learning_rate: 2.0e-4
+    gradient_checkpointing: true
+    loss: chunked
+    loss_chunk_size: 64
+    compare_loss_modes: [fused, standard]
+    sanity_overfit_steps: 4
+    lora: {r: 8, alpha: 16, dropout: 0.0}

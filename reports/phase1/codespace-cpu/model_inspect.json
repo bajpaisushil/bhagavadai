@@ -1,0 +1,395 @@
+{
+  "_meta": {
+    "report": "model_inspect",
+    "run_id": "20261118T090441Z-143fdf",
+    "created_utc": "2026-11-18T09:04:47+00:00",
+    "package_version": "0.1.0",
+    "git": {
+      "commit": "9d8fab7e7127f9551f52dcafa498f4e59a3672ed",
+      "dirty": true
+    }
+  },
+  "model": "Qwen/Qwen3.5-0.8B-Base",
+  "revision": "dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68",
+  "architecture": {
+    "architectures": [
+      "Qwen3_5ForConditionalGeneration"
+    ],
+    "text_model_type": "qwen3_5_text",
+    "layer_types": {
+      "full_attention": 6,
+      "linear_attention": 18
+    },
+    "hidden_size": 1024,
+    "num_hidden_layers": 24,
+    "intermediate_size": 3584,
+    "num_attention_heads": 8,
+    "num_key_value_heads": 2,
+    "head_dim": 256,
+    "linear_num_key_heads": 16,
+    "linear_num_value_heads": 16,
+    "linear_key_head_dim": 128,
+    "linear_value_head_dim": 128,
+    "vocab_size": 248320,
+    "max_position_embeddings": 262144,
+    "tie_word_embeddings": true,
+    "mtp_num_hidden_layers": 1,
+    "has_vision_tower": true
+  },
+  "tokenizer": {
+    "tokenizer_class": "Qwen3_5Tokenizer",
+    "vocab_size_with_added": 248077,
+    "model_max_length": 262144,
+    "special_tokens": {
+      "bos": null,
+      "eos": "<|endoftext|>",
+      "eos_id": 248044,
+      "pad": "<|endoftext|>",
+      "pad_id": 248044,
+      "padding_side": "right"
+    },
+    "control_tokens": {
+      "<|im_start|>": {
+        "ids": [
+          248045
+        ],
+        "single_token": true
+      },
+      "<|im_end|>": {
+        "ids": [
+          248046
+        ],
+        "single_token": true
+      },
+      "<|endoftext|>": {
+        "ids": [
+          248044
+        ],
+        "single_token": true
+      },
+      "<think>": {
+        "ids": [
+          248068
+        ],
+        "single_token": true
+      },
+      "</think>": {
+        "ids": [
+          248069
+        ],
+        "single_token": true
+      }
+    },
+    "control_tokens_all_single": true,
+    "chat_template": {
+      "sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80",
+      "supports_enable_thinking": true,
+      "has_generation_markers": false,
+      "generation_prompt_suffix": "<|im_start|>assistant\n<think>\n\n</think>\n\n",
+      "rendered_sample": "<|im_start|>system\nYou are Bhagavatam AI, an AI assistant trained on properly licensed English translations of the Śrīmad-Bhāgavatam. You explain its narratives and teachings in clear, natural English with a calm, respectful, thoughtful teaching style. You are an AI, not a sage or any historical or religious figure. Give Canto.Chapter.Verse references only when you are confident they are correct, distinguish what the text states from interpretation, name the translation when it matters, never invent quotations or verse numbers, and say plainly when the Bhāgavatam does not address a question or you do not know.<|im_end|>\n<|im_start|>user\nWho is Parīkṣit?<|im_end|>\n<|im_start|>assistant\nParīkṣit is the king who hears the Bhāgavatam from Śukadeva.<|im_end|>\n<|im_start|>user\nWhere did they meet?<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n"
+    },
+    "iast": {
+      "terms": [
+        {
+          "term": "Śrīmad-Bhāgavatam",
+          "tokens": 10,
+          "chars_per_token": 1.7,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Bhāgavata Purāṇa",
+          "tokens": 12,
+          "chars_per_token": 1.33,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Śukadeva Gosvāmī",
+          "tokens": 8,
+          "chars_per_token": 2.0,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Sūta Gosvāmī",
+          "tokens": 7,
+          "chars_per_token": 1.71,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Maitreya Ṛṣi",
+          "tokens": 11,
+          "chars_per_token": 1.09,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Parīkṣit",
+          "tokens": 7,
+          "chars_per_token": 1.14,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Kṛṣṇa",
+          "tokens": 11,
+          "chars_per_token": 0.45,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Nārada",
+          "tokens": 3,
+          "chars_per_token": 2.0,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Vyāsadeva",
+          "tokens": 4,
+          "chars_per_token": 2.25,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Prahlāda",
+          "tokens": 4,
+          "chars_per_token": 2.0,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Dhruva",
+          "tokens": 4,
+          "chars_per_token": 1.5,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Uddhava",
+          "tokens": 4,
+          "chars_per_token": 1.75,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Vidura",
+          "tokens": 3,
+          "chars_per_token": 2.0,
+          "round_trip_exact": true
+        },
+        {
+          "term": "bhakti",
+          "tokens": 3,
+          "chars_per_token": 2.0,
+          "round_trip_exact": true
+        },
+        {
+          "term": "dharma",
+          "tokens": 2,
+          "chars_per_token": 3.0,
+          "round_trip_exact": true
+        },
+        {
+          "term": "ātmā",
+          "tokens": 3,
+          "chars_per_token": 1.33,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Brahman",
+          "tokens": 3,
+          "chars_per_token": 2.33,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Paramātmā",
+          "tokens": 4,
+          "chars_per_token": 2.25,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Bhagavān",
+          "tokens": 6,
+          "chars_per_token": 1.33,
+          "round_trip_exact": true
+        },
+        {
+          "term": "māyā",
+          "tokens": 4,
+          "chars_per_token": 1.0,
+          "round_trip_exact": true
+        },
+        {
+          "term": "guṇa",
+          "tokens": 5,
+          "chars_per_token": 0.8,
+          "round_trip_exact": true
+        },
+        {
+          "term": "saṅkīrtana",
+          "tokens": 8,
+          "chars_per_token": 1.25,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Vaikuṇṭha",
+          "tokens": 9,
+          "chars_per_token": 1.0,
+          "round_trip_exact": true
+        },
+        {
+          "term": "Naimiṣāraṇya",
+          "tokens": 12,
+          "chars_per_token": 1.0,
+          "round_trip_exact": true
+        }
+      ],
+      "mean_chars_per_token": 1.41,
+      "all_round_trip_exact": true
+    },
+    "normalization_probes": [
+      {
+        "label": "kṛṣṇa NFC",
+        "codepoints": 5,
+        "tokens": 11,
+        "ids": [
+          74,
+          157,
+          117,
+          249,
+          157,
+          117,
+          96,
+          157,
+          117,
+          229,
+          64
+        ]
+      },
+      {
+        "label": "kṛṣṇa NFD",
+        "codepoints": 8,
+        "tokens": 11,
+        "ids": [
+          74,
+          157,
+          117,
+          249,
+          157,
+          117,
+          96,
+          157,
+          117,
+          229,
+          64
+        ]
+      },
+      {
+        "label": "krishna ASCII",
+        "codepoints": 7,
+        "tokens": 3,
+        "ids": [
+          9563,
+          786,
+          3267
+        ]
+      },
+      {
+        "label": "kRSNa Harvard-Kyoto",
+        "codepoints": 5,
+        "tokens": 3,
+        "ids": [
+          74,
+          11122,
+          15716
+        ]
+      },
+      {
+        "label": "saṃsāra dot-below anusvara",
+        "codepoints": 7,
+        "tokens": 7,
+        "ids": [
+          8808,
+          157,
+          117,
+          225,
+          82,
+          29656,
+          926
+        ]
+      },
+      {
+        "label": "saṁsāra dot-above anusvara",
+        "codepoints": 7,
+        "tokens": 7,
+        "ids": [
+          8808,
+          157,
+          117,
+          223,
+          82,
+          29656,
+          926
+        ]
+      }
+    ],
+    "nfc_and_nfd_tokenize_identically": true,
+    "anusvara_variants_tokenize_identically": false,
+    "english": {
+      "words": 29,
+      "tokens": 35,
+      "tokens_per_word": 1.21,
+      "chars_per_token": 5.26
+    }
+  },
+  "control_token_embeddings": {
+    "vocab_rows": 248320,
+    "sampled_rows": 4096,
+    "median_norm": 0.6273,
+    "p05_norm": 0.542,
+    "random_init_reference": {
+      "norm": 0.64,
+      "max_abs_cosine": 0.127
+    },
+    "tokens": {
+      "<|im_start|>": {
+        "norm": 0.5282,
+        "ratio_to_median": 0.842,
+        "max_cosine_to_sample": 0.183
+      },
+      "<|im_end|>": {
+        "norm": 0.6166,
+        "ratio_to_median": 0.983,
+        "max_cosine_to_sample": 0.177
+      },
+      "<|endoftext|>": {
+        "norm": 0.8785,
+        "ratio_to_median": 1.4,
+        "max_cosine_to_sample": 0.221
+      },
+      "<think>": {
+        "norm": 0.5502,
+        "ratio_to_median": 0.877,
+        "max_cosine_to_sample": 0.141
+      },
+      "</think>": {
+        "norm": 0.5674,
+        "ratio_to_median": 0.905,
+        "max_cosine_to_sample": 0.138
+      },
+      "<|fim_pad|>": {
+        "norm": 0.4207,
+        "ratio_to_median": 0.671,
+        "max_cosine_to_sample": 1.0
+      }
+    },
+    "pairwise_cosine": {
+      "<|im_start|>|<|im_end|>": 0.124,
+      "<|im_start|>|<|endoftext|>": 0.044,
+      "<|im_start|>|<think>": 0.184,
+      "<|im_start|>|</think>": 0.175,
+      "<|im_start|>|<|fim_pad|>": 0.081,
+      "<|im_end|>|<|endoftext|>": 0.516,
+      "<|im_end|>|<think>": 0.287,
+      "<|im_end|>|</think>": 0.212,
+      "<|im_end|>|<|fim_pad|>": -0.25,
+      "<|endoftext|>|<think>": 0.25,
+      "<|endoftext|>|</think>": 0.123,
+      "<|endoftext|>|<|fim_pad|>": -0.399,
+      "<think>|</think>": 0.33,
+      "<think>|<|fim_pad|>": 0.021,
+      "</think>|<|fim_pad|>": 0.072
+    }
+  }
+}

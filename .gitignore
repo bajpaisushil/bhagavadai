@@ -1,0 +1,46 @@
+# --- Python / tooling ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.python-version.local
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+
+# --- Secrets / local env ---
+.env
+.env.*
+!.env.example
+
+# --- Data: never commit source texts; they are reproducible from the manifest ---
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# --- Model artifacts ---
+checkpoints/*
+!checkpoints/.gitkeep
+models/
+*.safetensors
+*.bin
+*.gguf
+
+# --- Generated reports (commit curated evidence under reports/phase*/ explicitly) ---
+reports/*
+!reports/.gitkeep
+!reports/phase1/
+
+# --- OS / editors ---
+.DS_Store
+.idea/
+.vscode/
+*.swp

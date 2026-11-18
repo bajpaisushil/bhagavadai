@@ -1,0 +1,126 @@
+{
+  "_meta": {
+    "report": "model_smoke",
+    "run_id": "20261118T090458Z-d7c07b",
+    "created_utc": "2026-11-18T09:06:11+00:00",
+    "package_version": "0.1.0",
+    "git": {
+      "commit": "9d8fab7e7127f9551f52dcafa498f4e59a3672ed",
+      "dirty": true
+    }
+  },
+  "load": {
+    "model_class": "Qwen3_5ForCausalLM",
+    "revision": "dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68",
+    "dtype": "float32",
+    "device": "cpu",
+    "load_seconds": 19.99,
+    "num_parameters": 752393024,
+    "num_embedding_parameters": 254279680,
+    "tied_embeddings": true,
+    "missing_keys": [],
+    "unexpected_keys": [],
+    "mismatched_keys": [],
+    "spot_checks": {
+      "model.embed_tokens.weight": true,
+      "model.layers.0.linear_attn.in_proj_qkv.weight": true,
+      "model.layers.0.linear_attn.A_log": true,
+      "model.layers.3.self_attn.q_proj.weight": true,
+      "model.layers.23.mlp.down_proj.weight": true,
+      "model.norm.weight": true
+    },
+    "layer_types": {
+      "linear_attention": 18,
+      "full_attention": 6
+    },
+    "fast_path_kernels": {
+      "fla": false,
+      "causal_conv1d": false
+    },
+    "warnings": [
+      "Gated DeltaNet runs on the reference PyTorch path (flash-linear-attention / causal-conv1d are CUDA-only and not installed): correct but slower."
+    ]
+  },
+  "smoke": {
+    "params": {
+      "max_new_tokens": 48,
+      "do_sample": false,
+      "temperature": 0.7,
+      "top_p": 0.9,
+      "top_k": 50,
+      "repetition_penalty": 1.1
+    },
+    "results": [
+      {
+        "id": "completion-en",
+        "mode": "completion",
+        "input": "The Śrīmad-Bhāgavatam is",
+        "text": "a 10-volume work of the Hindu epic, composed by the sage Kṛṣṇa in the 8th century CE. It is considered one of the most important and influential texts in Indian literature",
+        "prompt_tokens": 12,
+        "new_tokens": 48,
+        "seconds": 11.659,
+        "tokens_per_s": 4.12,
+        "stopped_on_stop_token": false,
+        "repeated_trigram_ratio": 0.0,
+        "ok": true
+      },
+      {
+        "id": "completion-iast",
+        "mode": "completion",
+        "input": "In the Bhāgavata Purāṇa, King Parīkṣit asked Śukadeva",
+        "text": "‑Svāmī to explain why he was unable to see his wife. The text records that Śukadeva‑Svāmī replied:\n\n> “Because you have not seen me in my true form; I am a",
+        "prompt_tokens": 27,
+        "new_tokens": 48,
+        "seconds": 11.152,
+        "tokens_per_s": 4.3,
+        "stopped_on_stop_token": false,
+        "repeated_trigram_ratio": 0.0,
+        "ok": true
+      },
+      {
+        "id": "chat-narrator",
+        "mode": "chat",
+        "input": "Who narrated the Śrīmad-Bhāgavatam to King Parīkṣit?",
+        "text": "The Śrīmad-Bhāgavatam was narrated by Lord Caitanya (Caitanya) to King Parikshit. This is explicitly stated in the first canto of the work. The narrative begins with the story of",
+        "prompt_tokens": 167,
+        "new_tokens": 48,
+        "seconds": 13.494,
+        "tokens_per_s": 3.56,
+        "stopped_on_stop_token": false,
+        "repeated_trigram_ratio": 0.0,
+        "ok": true
+      },
+      {
+        "id": "chat-philosophy",
+        "mode": "chat",
+        "input": "Why does a person suffer even when they try to do good?",
+        "text": "The Bhāgavatam addresses this profound question in several places, primarily through the lens of karma (action) and the nature of suffering. Here is a breakdown of how the text explains why one can still experience suffering despite efforts for goodness",
+        "prompt_tokens": 156,
+        "new_tokens": 48,
+        "seconds": 13.42,
+        "tokens_per_s": 3.58,
+        "stopped_on_stop_token": false,
+        "repeated_trigram_ratio": 0.0,
+        "ok": true
+      }
+    ],
+    "all_ok": true
+  },
+  "memory": {
+    "peak_process_rss_gb": 4.536,
+    "min_system_available_gb": 0.906,
+    "peak_device_allocated_gb": null,
+    "peak_device_driver_gb": null,
+    "samples": 1367,
+    "baseline": {
+      "process_rss_bytes": 0.245,
+      "system_available_bytes": 4.901,
+      "system_total_bytes": 7.756,
+      "swap_used_bytes": 0.0,
+      "device_allocated_bytes": null,
+      "device_driver_bytes": null
+    },
+    "swap_growth_gb": 0.0,
+    "system_memory_consumed_gb": 3.995
+  }
+}

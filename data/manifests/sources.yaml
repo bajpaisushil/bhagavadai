@@ -1,0 +1,158 @@
+# Source and licensing manifest. Enforced in code: see src/bhagavatam_ai/data/manifest.py.
+#
+# Rules:
+# * Every entry cites evidence (URL + exact quote + date). "Publicly accessible", "free API" or
+#   "on GitHub" is NOT a licence.
+# * usage.training_text may only be true for public_domain / open_license / permission_granted.
+# * excluded / permission_required entries may not list downloads or grant any usage.
+# * Change an entry only with new evidence, and record it here.
+version: 1
+updated: 2026-11-18
+policy: >-
+  Training text must be verifiably public domain or licensed for ML training, model-weight
+  distribution and a public demo. Bhaktivedanta Book Trust (BBT) translations and purports by
+  A. C. Bhaktivedanta Swami Prabhupada are excluded unless written permission covering those uses is
+  obtained. Non-expressive facts (verse numbering, chapter structure, speaker labels) may be derived from
+  sources marked usage.metadata. Different translations are never mixed without source identification.
+
+sources:
+  # ------------------------------------------------------------------ Sanskrit
+  - id: gretil-bhagavata-purana
+    title: "Bhāgavatapurāṇa, GRETIL TEI edition (sa_bhAgavatapurANa.xml)"
+    author_translator: "Sanskrit original; data entry credited to Ulrich Stiehl (actual typist unknown); TEI conversion by Maximilian Mehner (2020)"
+    language: sa
+    content_roles: [sanskrit_text]
+    edition: "GRETIL corpustei file, Last-Modified 2020-09-10. The printed source edition is not named (empty TEI sourceDesc)."
+    publication_years: "e-text online since 2001 (GRETIL update #4, 2001-12-21); TEI 2020"
+    copyright_holder: "Unclear. Underlying Sanskrit text is public domain; e-text rights rest with GRETIL contributors; cantos 3-5 and 10-12 may derive from the BBT romanised edition (unverified)."
+    license: "CC BY-NC-SA 4.0 (per-file TEI header, added in GRETIL's 2020 mass conversion)"
+    license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+    attribution_requirements: "Credit GRETIL (Göttingen Register of Electronic Texts in Indian Languages) and contributors; link the licence; indicate changes."
+    commercial_use: not_allowed
+    ml_training: unclear
+    permission_status: under_review
+    usage: {download: true, metadata: true, training_text: false, evaluation_reference: false}
+    reference_structure: true
+    evidence:
+      - url: https://gretil.sub.uni-goettingen.de/gretil/corpustei/sa_bhAgavatapurANa.xml
+        quote: "Distributed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License."
+        retrieved_on: 2026-11-18
+      - url: https://gretil.sub.uni-goettingen.de/gretil/corpustei/sa_bhAgavatapurANa.xml
+        quote: "This e-text was provided to GRETIL in good faith that no copyright rights have been infringed. If anyone wishes to assert copyright over this file, please contact the GRETIL management"
+        retrieved_on: 2026-11-18
+      - url: https://gretil.sub.uni-goettingen.de/gretil/1_sanskr/3_purana/bhagp/bhp1-12u.htm
+        quote: "THIS GRETIL TEXT FILE IS FOR REFERENCE PURPOSES ONLY! COPYRIGHT AND TERMS OF USAGE AS FOR SOURCE FILE."
+        retrieved_on: 2026-11-18
+      - url: https://grantha.jiva.org/index.php?show=entry&e_no=692
+        quote: "I believe the original source of this text was the BBT Folio version of the Srimad Bhagavatam."
+        retrieved_on: 2026-11-18
+    original_source_urls:
+      - https://gretil.sub.uni-goettingen.de/gretil.html
+    downloads:
+      - url: https://gretil.sub.uni-goettingen.de/gretil/corpustei/sa_bhAgavatapurANa.xml
+        filename: sa_bhAgavatapurANa.xml
+        format: tei-xml
+        sha256: 5b4271b0703cb1ad21c97142e7366a61de608988c6073464eef0749bcfa20d43
+    parser: gretil_tei_bhp
+    coverage: "All 12 cantos, 335 chapters, 14,099 verse records (14,091 distinct verse numbers)."
+    risks:
+      - "Non-commercial and share-alike: training on it could oblige releasing weights/derived data under BY-NC-SA."
+      - "Cantos 3, 4, 5, 10, 11, 12 (about 67% of verses) show BBT house style (hyphenated compounds, 'śrī-śuka uvāca') and OCR errors from a printed romanised edition; GRETIL's named source believes the text came from the BBT Folio."
+      - "Known file defects (duplicated half-verses, 30 mislabelled IDs, typos) - repaired and flagged by the parser."
+    notes: "Used only for verse structure (chapter/verse counts) and speaker labels until provenance and NC-SA obligations are resolved. Not redistributed: data/raw is git-ignored."
+    reviewed_on: 2026-11-18
+    review_status: researched
+
+  - id: dcs-bhagavata-purana
+    title: "Digital Corpus of Sanskrit - Bhāgavatapurāṇa (CoNLL-U)"
+    author_translator: "Oliver Hellwig (annotation); text derived from GRETIL"
+    language: sa
+    content_roles: [sanskrit_text, metadata]
+    edition: "github.com/OliverHellwig/sanskrit dcs/data/conllu, 119 of 335 chapters"
+    publication_years: "2010-2026"
+    copyright_holder: "Oliver Hellwig (annotations); upstream text chain unclear"
+    license: "CC BY 4.0 (GitHub readme; the website states CC BY 3.0)"
+    license_url: https://creativecommons.org/licenses/by/4.0/
+    attribution_requirements: "Cite: Oliver Hellwig: Digital Corpus of Sanskrit (DCS). 2010-2024."
+    commercial_use: unclear
+    ml_training: unclear
+    permission_status: under_review
+    usage: {}
+    evidence:
+      - url: https://github.com/OliverHellwig/sanskrit/blob/master/dcs/data/readme.md
+        quote: "The data of the DCS and any data in child directories are licensed under the Creative Common BY 4.0 (CC BY 4.0) license."
+        retrieved_on: 2026-11-18
+    original_source_urls: [https://github.com/OliverHellwig/sanskrit]
+    coverage: "119 of 335 chapters (~37% of verses): 1.x, 2.x, 3.x, most of 4.1-4.28, 8.6-8.9, 10.1-10.5, 11.1-11.21."
+    risks: ["Text derived from GRETIL, whose terms were 'reference purposes only' before 2020 and BY-NC-SA after: chain of title unclear."]
+    notes: "Candidate for lemma/morphology metadata. Ask the author whether the BY grant covers the GRETIL-derived text."
+    reviewed_on: 2026-11-18
+
+  - id: sa-wikisource-bhagavata-purana
+    title: "श्रीमद्भागवतपुराणम् (Sanskrit Wikisource)"
+    author_translator: "Sanskrit original; Wikisource contributors"
+    language: sa
+    content_roles: [sanskrit_text]
+    edition: "sa.wikisource.org, Devanagari, 335 chapter pages; source edition undocumented"
+    publication_years: "pages created 2012-2016"
+    copyright_holder: "Wikisource contributors (for any copyrightable contribution)"
+    license: "CC BY-SA 4.0 (site footer; 'additional terms may apply')"
+    license_url: https://creativecommons.org/licenses/by-sa/4.0/
+    attribution_requirements: "Attribute Wikisource contributors; share alike."
+    commercial_use: allowed
+    ml_training: unclear
+    permission_status: under_review
+    usage: {}
+    evidence:
+      - url: https://sa.wikisource.org/wiki/श्रीमद्भागवतपुराणम्
+        quote: "पाठः क्रियेटिव कॉमन्स ऐट्रिब्यूशन/शेयर-अलाइक अभिज्ञापत्रस्य अन्तर्गततया उपलब्धः अस्ति; अन्याः संस्थित्यः अपि सन्ति"
+        retrieved_on: 2026-11-18
+    original_source_urls: [https://sa.wikisource.org/wiki/श्रीमद्भागवतपुराणम्]
+    coverage: "All 335 chapters, standard numbering, speaker lines and colophons."
+    risks: ["Source edition undocumented; readings differ from GRETIL.", "Share-alike obligations for derived datasets/weights are legally unsettled."]
+    notes: "Most promising complete Sanskrit source if its edition can be identified."
+    reviewed_on: 2026-11-18
+
+  - id: sanskritdocuments-bhagavata-purana
+    title: "bhAgavatapurANam (sanskritdocuments.org, ITRANS/Devanagari)"
+    author_translator: "Volunteers; text provided by Ulrich Stiehl (GRETIL family)"
+    language: sa
+    content_roles: [sanskrit_text]
+    edition: "doc_purana/bhagpur.itx and per-skandha files"
+    publication_years: "2010-2025"
+    copyright_holder: "sanskritdocuments.org volunteers"
+    license: "Personal study and research only; AI ingestion prohibited without written permission"
+    attribution_requirements: "n/a"
+    commercial_use: not_allowed
+    ml_training: not_allowed
+    permission_status: excluded
+    usage: {}
+    evidence:
+      - url: https://sanskritdocuments.org/sanskritfaq.html
+        quote: "Automated scraping, bulk downloading, database extraction, or ingestion of these formatted files for external websites, applications, or AI models is strictly prohibited without prior written permission."
+        retrieved_on: 2026-11-18
+    original_source_urls: [https://sanskritdocuments.org/itrans/purana/]
+    risks: ["Explicit prohibition on AI ingestion."]
+    reviewed_on: 2026-11-18
+
+  - id: gaudiya-grantha-mandira-bhagavata
+    title: "Bhagavata-purana :: Mulamatram (Gaudiya Grantha Mandira)"
+    author_translator: "Unknown; editor believes it derives from the BBT Folio"
+    language: sa
+    content_roles: [sanskrit_text]
+    edition: "grantha.jiva.org entry 692"
+    publication_years: "2003-2006"
+    copyright_holder: "Jiva Gaudiya Grantha Mandira (site); possibly BBT (text origin)"
+    license: "All rights reserved (site footer); no open licence"
+    attribution_requirements: "n/a"
+    commercial_use: not_allowed
+    ml_training: not_allowed
+    permission_status: excluded
+    usage: {}
+    evidence:
+      - url: https://grantha.jiva.org/index.php?show=entry&e_no=692
+        quote: "I believe the original source of this text was the BBT Folio version of the Srimad Bhagavatam."
+        retrieved_on: 2026-11-18
+    original_source_urls: [https://grantha.jiva.org/]
+    risks: ["No licence; probable BBT origin."]
+    reviewed_on: 2026-11-18

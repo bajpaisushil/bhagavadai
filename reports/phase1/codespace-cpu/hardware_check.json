@@ -1,0 +1,616 @@
+{
+  "_meta": {
+    "report": "hardware_check",
+    "run_id": "20261118T090709Z-ca1799",
+    "created_utc": "2026-11-18T09:09:37+00:00",
+    "package_version": "0.1.0",
+    "git": {
+      "commit": "9d8fab7e7127f9551f52dcafa498f4e59a3672ed",
+      "dirty": true
+    }
+  },
+  "environment": {
+    "os": "Linux",
+    "os_release": "6.8.0-1070-azure",
+    "macos_version": null,
+    "machine": "x86_64",
+    "python": "3.14.2",
+    "python_is_arm64_native": null,
+    "cpu_logical": 2,
+    "cpu_physical": 1,
+    "memory_total_gb": 7.76,
+    "memory_available_gb": 4.98,
+    "packages": {
+      "torch": "2.15.0+cpu",
+      "transformers": "5.23.0",
+      "peft": "0.21.3",
+      "accelerate": "1.16.0",
+      "safetensors": "0.8.0",
+      "huggingface-hub": "2.4.0",
+      "tokenizers": "0.23.3",
+      "numpy": "2.5.5"
+    },
+    "env_vars": {
+      "PYTORCH_ENABLE_MPS_FALLBACK": null,
+      "PYTORCH_MPS_HIGH_WATERMARK_RATIO": null,
+      "PYTORCH_MPS_LOW_WATERMARK_RATIO": null,
+      "OMP_NUM_THREADS": null,
+      "TOKENIZERS_PARALLELISM": null
+    },
+    "env_vars_set": {
+      "HF_HOME": false,
+      "HF_TOKEN": false,
+      "HUGGINGFACE_HUB_CACHE": false,
+      "TRANSFORMERS_CACHE": false
+    },
+    "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+    "torch": {
+      "version": "2.15.0+cpu",
+      "num_threads": 1,
+      "mps_built": false,
+      "mps_available": false,
+      "cuda_available": false
+    }
+  },
+  "device": "cpu",
+  "dtype": "float32",
+  "config": {
+    "device": "cpu",
+    "seed": 1234,
+    "mps_memory_fraction": null,
+    "max_swap_growth_gb": 0.5,
+    "min_system_available_gb": 1.0,
+    "op_checks": {
+      "enabled": true,
+      "dtypes": [
+        "float32",
+        "bfloat16"
+      ]
+    },
+    "numerics": {
+      "compare_with_cpu_reference": false,
+      "max_abs_loss_diff": 0.08,
+      "min_top1_agreement": 0.85
+    },
+    "generation": {
+      "max_new_tokens": 8
+    },
+    "training": {
+      "enabled": true,
+      "seq_lens": [
+        64,
+        128
+      ],
+      "batch_size": 1,
+      "warmup_steps": 0,
+      "measured_steps": 1,
+      "learning_rate": 0.0002,
+      "gradient_checkpointing": true,
+      "loss": "chunked",
+      "loss_chunk_size": 64,
+      "compare_loss_modes": [
+        "fused",
+        "standard"
+      ],
+      "sustained_minutes": 0.0,
+      "sanity_overfit_steps": 4,
+      "lora": {
+        "r": 8,
+        "alpha": 16,
+        "dropout": 0.0
+      }
+    }
+  },
+  "thermal_before": null,
+  "op_checks": [
+    {
+      "name": "matmul_batched",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0003,
+      "detail": null
+    },
+    {
+      "name": "matmul_batched",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.003799441625361745,
+      "tolerance": 0.06,
+      "seconds": 0.0044,
+      "detail": null
+    },
+    {
+      "name": "lora_linear_backward",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0007,
+      "detail": null
+    },
+    {
+      "name": "lora_linear_backward",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.005966784198971286,
+      "tolerance": 0.06,
+      "seconds": 0.0097,
+      "detail": null
+    },
+    {
+      "name": "causal_conv1d",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0012,
+      "detail": null
+    },
+    {
+      "name": "causal_conv1d",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.005068434576134392,
+      "tolerance": 0.06,
+      "seconds": 0.0102,
+      "detail": null
+    },
+    {
+      "name": "gated_delta_rule_chunked",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0032,
+      "detail": null
+    },
+    {
+      "name": "gated_delta_rule_chunked",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.009346753164188983,
+      "tolerance": 0.06,
+      "seconds": 0.0051,
+      "detail": null
+    },
+    {
+      "name": "gated_delta_rule_recurrent",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0002,
+      "detail": null
+    },
+    {
+      "name": "gated_delta_rule_recurrent",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.004636071226390819,
+      "tolerance": 0.06,
+      "seconds": 0.0002,
+      "detail": null
+    },
+    {
+      "name": "sdpa_gqa_causal",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0033,
+      "detail": null
+    },
+    {
+      "name": "sdpa_gqa_causal",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.008018683605834295,
+      "tolerance": 0.06,
+      "seconds": 0.014,
+      "detail": null
+    },
+    {
+      "name": "sdpa_gqa_masked",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0023,
+      "detail": null
+    },
+    {
+      "name": "sdpa_gqa_masked",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.008018683605834295,
+      "tolerance": 0.06,
+      "seconds": 0.0104,
+      "detail": null
+    },
+    {
+      "name": "rmsnorm_gated",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0006,
+      "detail": null
+    },
+    {
+      "name": "rmsnorm_gated",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.010551848264798538,
+      "tolerance": 0.06,
+      "seconds": 0.0003,
+      "detail": null
+    },
+    {
+      "name": "cross_entropy_large_vocab",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.1542,
+      "detail": null
+    },
+    {
+      "name": "cross_entropy_large_vocab",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.005294479997262243,
+      "tolerance": 0.06,
+      "seconds": 2.825,
+      "detail": null
+    },
+    {
+      "name": "embedding_backward",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0615,
+      "detail": null
+    },
+    {
+      "name": "embedding_backward",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.002824375581863101,
+      "tolerance": 0.06,
+      "seconds": 0.0381,
+      "detail": null
+    },
+    {
+      "name": "adamw_fused",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0114,
+      "detail": null
+    },
+    {
+      "name": "autocast_matmul",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0,
+      "detail": null
+    },
+    {
+      "name": "autocast_matmul",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.0033384346726394298,
+      "tolerance": 0.06,
+      "seconds": 0.0009,
+      "detail": null
+    },
+    {
+      "name": "sampling_topk_multinomial",
+      "dtype": "float32",
+      "status": "pass",
+      "max_rel_error": 0.0,
+      "tolerance": 0.002,
+      "seconds": 0.0186,
+      "detail": null
+    },
+    {
+      "name": "sampling_topk_multinomial",
+      "dtype": "bfloat16",
+      "status": "pass",
+      "max_rel_error": 0.008433551984121882,
+      "tolerance": 0.06,
+      "seconds": 0.0201,
+      "detail": null
+    }
+  ],
+  "op_check_descriptions": {
+    "matmul_batched": "batched matmul",
+    "lora_linear_backward": "linear + LoRA branch, backward",
+    "causal_conv1d": "depthwise causal conv1d + SiLU (Gated DeltaNet), backward",
+    "gated_delta_rule_chunked": "transformers torch_chunk_gated_delta_rule (training/prefill), backward",
+    "gated_delta_rule_recurrent": "transformers torch_recurrent_gated_delta_rule (cached decoding)",
+    "sdpa_gqa_causal": "SDPA, 8q/2kv heads, head_dim 256, is_causal, enable_gqa, backward",
+    "sdpa_gqa_masked": "SDPA with explicit boolean mask + enable_gqa, backward",
+    "rmsnorm_gated": "gated RMSNorm (fp32 upcast), backward",
+    "cross_entropy_large_vocab": "cross-entropy over the 248,320-token vocabulary, backward",
+    "embedding_backward": "embedding lookup + backward on a 248,320-row table",
+    "adamw_fused": "fused AdamW optimizer step (fp32 LoRA parameters)",
+    "autocast_matmul": "torch.autocast mixed precision matmul",
+    "sampling_topk_multinomial": "softmax/top-k/multinomial over the full vocabulary"
+  },
+  "load": {
+    "ok": true,
+    "model_class": "Qwen3_5ForCausalLM",
+    "revision": "dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68",
+    "dtype": "float32",
+    "device": "cpu",
+    "load_seconds": 17.05,
+    "num_parameters": 752393024,
+    "num_embedding_parameters": 254279680,
+    "tied_embeddings": true,
+    "missing_keys": [],
+    "unexpected_keys": [],
+    "mismatched_keys": [],
+    "spot_checks": {
+      "model.embed_tokens.weight": true,
+      "model.layers.0.linear_attn.in_proj_qkv.weight": true,
+      "model.layers.0.linear_attn.A_log": true,
+      "model.layers.3.self_attn.q_proj.weight": true,
+      "model.layers.23.mlp.down_proj.weight": true,
+      "model.norm.weight": true
+    },
+    "layer_types": {
+      "linear_attention": 18,
+      "full_attention": 6
+    },
+    "fast_path_kernels": {
+      "fla": false,
+      "causal_conv1d": false
+    },
+    "warnings": [
+      "Gated DeltaNet runs on the reference PyTorch path (flash-linear-attention / causal-conv1d are CUDA-only and not installed): correct but slower."
+    ],
+    "memory": {
+      "peak_process_rss_gb": 4.677,
+      "min_system_available_gb": 0.89,
+      "peak_device_allocated_gb": null,
+      "peak_device_driver_gb": null,
+      "samples": 321,
+      "baseline": {
+        "process_rss_bytes": 0.568,
+        "system_available_bytes": 4.593,
+        "system_total_bytes": 7.756,
+        "swap_used_bytes": 0.0,
+        "device_allocated_bytes": null,
+        "device_driver_bytes": null
+      },
+      "swap_growth_gb": 0.0,
+      "system_memory_consumed_gb": 3.703
+    }
+  },
+  "numerics": {
+    "tokens": 96,
+    "loss": 2.7364,
+    "finite": true,
+    "ok": true
+  },
+  "generation": {
+    "prompt": "The Bhāgavata Purāṇa is a Sanskrit text that",
+    "new_tokens": 8,
+    "seconds": 2.337,
+    "tokens_per_s": 3.42,
+    "distinct_token_ratio": 1.0,
+    "text": " is considered the most important source of information",
+    "ok": true,
+    "memory": {
+      "peak_process_rss_gb": 3.312,
+      "min_system_available_gb": 1.792,
+      "peak_device_allocated_gb": null,
+      "peak_device_driver_gb": null,
+      "samples": 67,
+      "baseline": {
+        "process_rss_bytes": 3.299,
+        "system_available_bytes": 1.792,
+        "system_total_bytes": 7.756,
+        "swap_used_bytes": 0.0,
+        "device_allocated_bytes": null,
+        "device_driver_bytes": null
+      },
+      "swap_growth_gb": 0.0,
+      "system_memory_consumed_gb": 0.0
+    }
+  },
+  "lora": {
+    "trainable_parameters": 5111808,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj",
+      "in_proj_qkv",
+      "in_proj_z",
+      "out_proj",
+      "gate_proj",
+      "up_proj",
+      "down_proj"
+    ]
+  },
+  "training_sanity": {
+    "losses": [
+      2.4384,
+      1.1335,
+      0.3459,
+      0.1113
+    ],
+    "finite": true,
+    "decreased": true,
+    "ok": true
+  },
+  "training": {
+    "sweep": [
+      {
+        "seq_len": 64,
+        "batch_size": 1,
+        "loss_mode": "chunked",
+        "status": "ok",
+        "step_seconds": [
+          6.968
+        ],
+        "median_step_seconds": 6.968,
+        "tokens_per_s": 9.2,
+        "hours_per_million_tokens": 30.24,
+        "losses": [
+          0.0772
+        ],
+        "memory": {
+          "peak_process_rss_gb": 3.766,
+          "min_system_available_gb": 1.42,
+          "peak_device_allocated_gb": null,
+          "peak_device_driver_gb": null,
+          "samples": 138,
+          "baseline": {
+            "process_rss_bytes": 3.592,
+            "system_available_bytes": 1.576,
+            "system_total_bytes": 7.756,
+            "swap_used_bytes": 0.0,
+            "device_allocated_bytes": null,
+            "device_driver_bytes": null
+          },
+          "swap_growth_gb": 0.0,
+          "system_memory_consumed_gb": 0.156
+        },
+        "memory_pressure": false
+      },
+      {
+        "seq_len": 128,
+        "batch_size": 1,
+        "loss_mode": "chunked",
+        "status": "ok",
+        "step_seconds": [
+          13.116
+        ],
+        "median_step_seconds": 13.116,
+        "tokens_per_s": 9.8,
+        "hours_per_million_tokens": 28.46,
+        "losses": [
+          0.1346
+        ],
+        "memory": {
+          "peak_process_rss_gb": 3.75,
+          "min_system_available_gb": 1.426,
+          "peak_device_allocated_gb": null,
+          "peak_device_driver_gb": null,
+          "samples": 257,
+          "baseline": {
+            "process_rss_bytes": 3.592,
+            "system_available_bytes": 1.556,
+            "system_total_bytes": 7.756,
+            "swap_used_bytes": 0.0,
+            "device_allocated_bytes": null,
+            "device_driver_bytes": null
+          },
+          "swap_growth_gb": 0.0,
+          "system_memory_consumed_gb": 0.13
+        },
+        "memory_pressure": false
+      }
+    ],
+    "loss_mode_comparison": [
+      {
+        "seq_len": 128,
+        "batch_size": 1,
+        "loss_mode": "fused",
+        "status": "ok",
+        "step_seconds": [
+          23.95
+        ],
+        "median_step_seconds": 23.95,
+        "tokens_per_s": 5.3,
+        "hours_per_million_tokens": 51.98,
+        "losses": [
+          0.0164
+        ],
+        "memory": {
+          "peak_process_rss_gb": 3.595,
+          "min_system_available_gb": 1.577,
+          "peak_device_allocated_gb": null,
+          "peak_device_driver_gb": null,
+          "samples": 469,
+          "baseline": {
+            "process_rss_bytes": 3.592,
+            "system_available_bytes": 1.585,
+            "system_total_bytes": 7.756,
+            "swap_used_bytes": 0.0,
+            "device_allocated_bytes": null,
+            "device_driver_bytes": null
+          },
+          "swap_growth_gb": 0.0,
+          "system_memory_consumed_gb": 0.008
+        },
+        "memory_pressure": false
+      },
+      {
+        "seq_len": 128,
+        "batch_size": 1,
+        "loss_mode": "standard",
+        "status": "ok",
+        "step_seconds": [
+          11.213
+        ],
+        "median_step_seconds": 11.213,
+        "tokens_per_s": 11.4,
+        "hours_per_million_tokens": 24.33,
+        "losses": [
+          0.0127
+        ],
+        "memory": {
+          "peak_process_rss_gb": 3.935,
+          "min_system_available_gb": 1.236,
+          "peak_device_allocated_gb": null,
+          "peak_device_driver_gb": null,
+          "samples": 219,
+          "baseline": {
+            "process_rss_bytes": 3.595,
+            "system_available_bytes": 1.587,
+            "system_total_bytes": 7.756,
+            "swap_used_bytes": 0.0,
+            "device_allocated_bytes": null,
+            "device_driver_bytes": null
+          },
+          "swap_growth_gb": 0.0,
+          "system_memory_consumed_gb": 0.351
+        },
+        "memory_pressure": false
+      }
+    ]
+  },
+  "thermal_after": null,
+  "theoretical_memory": {
+    "lora_static_gb": 2.88,
+    "full_ft_all_params_gb": 11.21,
+    "full_ft_frozen_embeddings_gb": 8.37
+  },
+  "verdict": {
+    "device": "cpu",
+    "dtype": "float32",
+    "op_checks_ok": true,
+    "failed_ops": [],
+    "model_load_ok": true,
+    "numerics_ok": true,
+    "generation_ok": true,
+    "lora_training_ok": true,
+    "max_seq_len_without_memory_pressure": 128,
+    "tokens_per_s_at_max_seq_len": 9.8,
+    "hours_per_million_tokens_at_max_seq_len": 28.46,
+    "fastest_loss_mode": "standard",
+    "fastest_tokens_per_s": 11.4,
+    "ready_for_phase2": false,
+    "note": "Ran on CPU: this validates the pipeline only. Run on the Apple Silicon Mac for the real verdict."
+  }
+}

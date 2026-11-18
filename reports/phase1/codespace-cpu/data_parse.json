@@ -1,0 +1,50 @@
+{
+  "_meta": {
+    "report": "data_parse",
+    "run_id": "20261118T085123Z-2f9063",
+    "created_utc": "2026-11-18T08:51:26+00:00",
+    "package_version": "0.1.0",
+    "git": {
+      "commit": "9d8fab7e7127f9551f52dcafa498f4e59a3672ed",
+      "dirty": true
+    }
+  },
+  "sources": [
+    {
+      "source_id": "gretil-bhagavata-purana",
+      "parser": "gretil_tei_bhp",
+      "parser_version": "1.0.0",
+      "raw_file": "data/raw/gretil-bhagavata-purana/sa_bhAgavatapurANa.xml",
+      "raw_sha256": "5b4271b0703cb1ad21c97142e7366a61de608988c6073464eef0749bcfa20d43",
+      "records": 14099,
+      "chapters": 335,
+      "records_per_canto": {
+        "1": 813,
+        "2": 391,
+        "3": 1413,
+        "4": 1449,
+        "5": 663,
+        "6": 851,
+        "7": 750,
+        "8": 933,
+        "9": 965,
+        "10": 3940,
+        "11": 1366,
+        "12": 565
+      },
+      "duplicate_lines_removed": 584,
+      "labels_repaired": 30,
+      "duplicate_refs": 5,
+      "explicit_speakers": 1332,
+      "speaker_label_mismatches": [
+        "speaker at line 21198 labelled (3, 17, 2) precedes lines 21202-21205",
+        "speaker at line 28112 labelled (3, 30, 1) precedes lines 28116-28119",
+        "speaker at line 39756 labelled (4, 21, 45) precedes lines 39760-39763",
+        "speaker at line 46079 labelled (5, 1, 1) precedes lines 46080-46080",
+        "speaker at line 60458 labelled (7, 5, 44) precedes lines 60462-60465",
+        "speaker at line 67496 labelled (8, 3, 3) precedes lines 67500-67503",
+        "speaker at line 117045 labelled (10, 62, 16) precedes lines 117049-117052"
+      ]
+    }
+  ]
+}

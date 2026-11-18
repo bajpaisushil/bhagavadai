@@ -1,0 +1,176 @@
+# Canonical speaker names for Sanskrit speaker lines ("<name> uvāca").
+#
+# Keys are stems produced by bhagavatam_ai.data.normalize.speakers.speaker_key (sandhi and
+# orthography removed). Entries marked `ambiguous: true` are generic labels whose referent depends on
+# context (e.g. "rājā uvāca" is Parīkṣit in most chapters but King Rahūgaṇa in 5.10); the pipeline
+# keeps the raw label and does not guess a name for them. `formula: true` marks verse-introduction
+# formulae and mantras that appear in speaker position but are not speakers.
+#
+# Status: initial mapping derived from GRETIL speaker lines (1,332 attributions, 180 stems),
+# 2026-11-18. Review before using speaker names in SFT data.
+speakers:
+  # --- principal narrators and interlocutors
+  - {canonical: "Śukadeva Gosvāmī", keys: [śuka, bādarāyaṇi, vaiyāsaki]}
+  - {canonical: "Sūta Gosvāmī", keys: [sūta]}
+  - {canonical: "Maitreya Ṛṣi", keys: [maitreya]}
+  - {canonical: "Śrī Bhagavān (the Lord)", keys: [bhagavān, bhagavan], note: "Literal label; the form of the Lord depends on the episode. 'bhagavan' is a typo variant."}
+  - {canonical: "King Parīkṣit", keys: [parīkṣid, parīkṣit, viṣṇurāta]}
+  - {canonical: "Nārada Muni", keys: [nārada]}
+  - {canonical: "Vidura", keys: [vidura]}
+  - {canonical: "Uddhava", keys: [uddhava]}
+  - {canonical: "Lord Brahmā", keys: [brahma, brahmā]}
+  - {canonical: "Śaunaka Ṛṣi", keys: [śaunaka]}
+  - {canonical: "Vyāsadeva", keys: [vyāsa]}
+  - {canonical: "Lord Kapila", keys: [kapila]}
+  - {canonical: "Devahūti", keys: [devahūti]}
+  - {canonical: "Prahlāda Mahārāja", keys: [prahrāda, prahlāda]}
+  - {canonical: "Lord Śiva", keys: [rudra, mahādeva, śiva, śaṅkara]}
+  - {canonical: "Lord Ṛṣabhadeva", keys: [ṛṣabha]}
+  - {canonical: "Mārkaṇḍeya Ṛṣi", keys: [mārkaṇḍeya]}
+  # --- persons
+  - {canonical: "King Yudhiṣṭhira", keys: [yudhiṣṭhira]}
+  - {canonical: "Arjuna", keys: [arjuna]}
+  - {canonical: "Kuntī", keys: [kuntī]}
+  - {canonical: "Uttarā", keys: [uttara]}
+  - {canonical: "Bhīṣmadeva", keys: [bhīṣma]}
+  - {canonical: "Sañjaya", keys: [sañjaya]}
+  - {canonical: "Dhṛtarāṣṭra", keys: [dhṛtarāṣṭra]}
+  - {canonical: "Draupadī", keys: [draupadī]}
+  - {canonical: "Dharma", keys: [dharma]}
+  - {canonical: "Kali", keys: [kali]}
+  - {canonical: "Mother Earth", keys: [dharaṇī, dhara, bhūmi]}
+  - {canonical: "Vasudeva", keys: [vasudeva]}
+  - {canonical: "Devakī", keys: [devakī]}
+  - {canonical: "Nanda Mahārāja", keys: [nanda]}
+  - {canonical: "Akrūra", keys: [akrūra]}
+  - {canonical: "Garga Muni", keys: [garga]}
+  - {canonical: "Rukmiṇī", keys: [rukmiṇī]}
+  - {canonical: "Satyabhāmā", keys: [satyabhāma]}
+  - {canonical: "Jāmbavatī", keys: [jāmbavatī]}
+  - {canonical: "Kālindī", keys: [kālindī]}
+  - {canonical: "Mitravindā", keys: [mitravinda]}
+  - {canonical: "Satyā", keys: [satya]}
+  - {canonical: "Bhadrā", keys: [bhadra]}
+  - {canonical: "Lakṣmaṇā", keys: [lakṣmaṇa]}
+  - {canonical: "Mucukunda", keys: [mucukunda]}
+  - {canonical: "Kāliya", keys: [kāliya]}
+  - {canonical: "Cāṇūra", keys: [cāṇūra]}
+  - {canonical: "Rati", keys: [rati]}
+  - {canonical: "Citralekhā", keys: [citralekha]}
+  - {canonical: "King Nṛga", keys: [nṛga]}
+  - {canonical: "King Bahulāśva", keys: [bahulāśva]}
+  - {canonical: "Śrutadeva", keys: [śrutadeva]}
+  - {canonical: "Sanandana", keys: [sanandana]}
+  - {canonical: "the personified Vedas", keys: [śrutaya]}
+  - {canonical: "Varuṇa", keys: [varuṇa]}
+  - {canonical: "Surabhi", keys: [surabhi]}
+  - {canonical: "the Ocean", keys: [samudra]}
+  - {canonical: "the fever personified (Jvara)", keys: [jvara]}
+  - {canonical: "Indra", keys: [indra]}
+  - {canonical: "Bali Mahārāja", keys: [bali]}
+  - {canonical: "Vindhyāvali", keys: [vindhyāvali]}
+  - {canonical: "Śukrācārya", keys: [śukra]}
+  - {canonical: "Aditi", keys: [aditi]}
+  - {canonical: "Kaśyapa Muni", keys: [kaśyapa]}
+  - {canonical: "Diti", keys: [diti]}
+  - {canonical: "Hiraṇyakaśipu", keys: [hiraṇyakaśipu]}
+  - {canonical: "Gajendra", keys: [gajendra]}
+  - {canonical: "Dakṣa", keys: [dakṣa]}
+  - {canonical: "Satī", keys: [satī]}
+  - {canonical: "Pārvatī", keys: [pārvatī]}
+  - {canonical: "Dhruva Mahārāja", keys: [dhruva]}
+  - {canonical: "King Pṛthu", keys: [pṛthu]}
+  - {canonical: "King Vena", keys: [vena]}
+  - {canonical: "Kuvera", keys: [dhanada]}
+  - {canonical: "Sunanda and Nanda", keys: [sunandanandāv]}
+  - {canonical: "Sanat-kumāra", keys: [sanatkumāra]}
+  - {canonical: "Purañjana", keys: [purañjana]}
+  - {canonical: "King Prācīnabarhi", keys: [prācīnabarhi]}
+  - {canonical: "King Rahūgaṇa", keys: [rahūgaṇa]}
+  - {canonical: "Kardama Muni", keys: [kardama]}
+  - {canonical: "Atri Muni", keys: [atri]}
+  - {canonical: "Bhṛgu Muni", keys: [bhṛgu]}
+  - {canonical: "Agni", keys: [agni]}
+  - {canonical: "Aṅgirā Ṛṣi", keys: [aṅgirā]}
+  - {canonical: "Citraketu", keys: [citraketu]}
+  - {canonical: "Viśvarūpa", keys: [viśvarūpa]}
+  - {canonical: "Vṛtrāsura", keys: [vṛtra]}
+  - {canonical: "Yamarāja", keys: [yama]}
+  - {canonical: "King Ambarīṣa", keys: [ambarīṣa]}
+  - {canonical: "Durvāsā Muni", keys: [durvāsā]}
+  - {canonical: "Aṃśumān", keys: [aṃśumān]}
+  - {canonical: "Bhagīratha", keys: [bhagīratha]}
+  - {canonical: "King Yayāti", keys: [yayāti]}
+  - {canonical: "Pūru", keys: [pūru]}
+  - {canonical: "King Yadu", keys: [yadu]}
+  - {canonical: "Śakuntalā", keys: [śakuntala]}
+  - {canonical: "King Duṣmanta", keys: [duṣmanta]}
+  - {canonical: "Urvaśī", keys: [urvaśī]}
+  - {canonical: "King Purūravā (Aila)", keys: [aila]}
+  - {canonical: "Piṅgalā", keys: [piṅgala]}
+  - {canonical: "King Nimi (Videha)", keys: [videha]}
+  - {canonical: "Kavi", keys: [kavi]}
+  - {canonical: "Havi", keys: [havi]}
+  - {canonical: "Antarīkṣa", keys: [antarīkṣa]}
+  - {canonical: "Prabuddha", keys: [prabuddha]}
+  - {canonical: "Pippalāyana", keys: [pippalāyana]}
+  - {canonical: "Āvirhotra", keys: [āvirhotra]}
+  - {canonical: "Drumila", keys: [drumila]}
+  - {canonical: "Camasa", keys: [camasa]}
+  - {canonical: "Karabhājana", keys: [karabhājana]}
+  - {canonical: "Yājñavalkya", keys: [yājñavalkya]}
+  # --- groups
+  - {canonical: "the sages", keys: [ṛṣaya, munaya]}
+  - {canonical: "the Kumāras", keys: [kumārā, sanakādaya]}
+  - {canonical: "the demigods", keys: [devā]}
+  - {canonical: "the gopīs", keys: [gopya]}
+  - {canonical: "a gopī", keys: [gopī]}
+  - {canonical: "the cowherd men", keys: [gopa]}
+  - {canonical: "the brāhmaṇas", keys: [brāhmaṇā]}
+  - {canonical: "the priests", keys: [ṛtvija]}
+  - {canonical: "the members of the assembly", keys: [sadasyā, sadasaspataya]}
+  - {canonical: "the rulers of the planets", keys: [lokapālā]}
+  - {canonical: "the great yogīs", keys: [yogeśvarā]}
+  - {canonical: "the Siddhas", keys: [siddhā]}
+  - {canonical: "the Gandharvas", keys: [gandharvā]}
+  - {canonical: "the Vidyādharas", keys: [vidyādharā]}
+  - {canonical: "the Pracetās", keys: [pracetasa]}
+  - {canonical: "the Prajāpatis", keys: [prajāpataya]}
+  - {canonical: "the Viṣṇudūtas", keys: [viṣṇudūtā]}
+  - {canonical: "the Yamadūtas", keys: [yamadūtā]}
+  - {canonical: "the associates of Lord Viṣṇu", keys: [viṣṇupārṣadā]}
+  - {canonical: "the Pitās", keys: [pitara]}
+  - {canonical: "the Nāgas", keys: [nāgā]}
+  - {canonical: "the wives of Kāliya", keys: [nāgapatnya]}
+  - {canonical: "the Manus", keys: [manava]}
+  - {canonical: "the Cāraṇas", keys: [cāraṇā]}
+  - {canonical: "the Yakṣas", keys: [yakṣā]}
+  - {canonical: "the Kimpuruṣas", keys: [kimpuruṣā]}
+  - {canonical: "the Vaitālikas", keys: [vaitālikā]}
+  - {canonical: "the Kinnaras", keys: [kinnarā]}
+  - {canonical: "the sons of the demons", keys: [daityaputrā]}
+  - {canonical: "the sons of the spiritual master", keys: [guruputra]}
+  - {canonical: "the kings", keys: [rājāna]}
+  - {canonical: "the queens", keys: [mahiṣya]}
+  - {canonical: "Bhadraśravā and his associates", keys: [bhadraśravasa]}
+  # --- generic labels: referent depends on context, never resolved automatically
+  - {canonical: "the king", keys: [rāja], ambiguous: true, note: "Parīkṣit in most chapters; Rahūgaṇa in 5.10; others elsewhere."}
+  - {canonical: "the sage", keys: [ṛṣi], ambiguous: true}
+  - {canonical: "the brāhmaṇa", keys: [brāhmaṇa, dvija], ambiguous: true}
+  - {canonical: "the spiritual master", keys: [guru], ambiguous: true}
+  - {canonical: "the goddess", keys: [devī], ambiguous: true}
+  - {canonical: "the goddesses", keys: [devya], ambiguous: true}
+  - {canonical: "the women", keys: [rāmā], ambiguous: true}
+  - {canonical: "the wives", keys: [patnya], ambiguous: true}
+  - {canonical: "the sacrificer's wife", keys: [yajamānī], ambiguous: true}
+  - {canonical: "the Prajāpati", keys: [prajāpati], ambiguous: true}
+  - {canonical: "Manu", keys: [manu], ambiguous: true, note: "Several Manus speak in the text."}
+  - {canonical: "the living entity", keys: [jīva, jantu], ambiguous: true}
+  - {canonical: "the messenger", keys: [dūta], ambiguous: true}
+  - {canonical: "the charioteer", keys: [sārathi], ambiguous: true}
+  - {canonical: "the serpent", keys: [sarpa], ambiguous: true}
+  - {canonical: "the maidservant", keys: [sairandhrī], ambiguous: true}
+  - {canonical: "he", keys: [saha], ambiguous: true, note: "'sa ha uvāca' - he said."}
+  # --- not speakers
+  - {canonical: "(verse-introduction formula)", ambiguous: true, keys: [tathācoktam, tasyahavāeteślokā, yasyahapāṇḍaveyaślokāvudāharanti, tasyānuguṇānślokāngāyanti, tasyedamupagāyanti, tatrāyaṃśloka, gāyaticedam, etadevahidevāgāyanti], note: "Formula introducing quoted verses, not a speaker."}
+  - {canonical: "(mantra)", ambiguous: true, keys: [oṃnamobhagavatevāsudevāya], note: "Mantra in speaker position (4.8.54), not a speaker."}

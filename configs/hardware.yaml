@@ -1,0 +1,30 @@
+# Hardware check for the training machine (Apple Silicon, 16 GB unified memory).
+hardware_check:
+  device: auto
+  seed: 1234
+  mps_memory_fraction: 1.0
+  max_swap_growth_gb: 0.5
+  min_system_available_gb: 1.0
+  op_checks:
+    enabled: true
+    dtypes: [float32, bfloat16, float16]
+  numerics:
+    compare_with_cpu_reference: true
+    max_abs_loss_diff: 0.08
+    min_top1_agreement: 0.85
+  generation:
+    max_new_tokens: 32
+  training:
+    enabled: true
+    seq_lens: [256, 512, 1024, 2048]
+    batch_size: 1
+    warmup_steps: 1
+    measured_steps: 3
+    learning_rate: 2.0e-4
+    gradient_checkpointing: true
+    loss: chunked
+    loss_chunk_size: 1024
+    compare_loss_modes: [fused, standard]
+    sustained_minutes: 0      # set to ~20 for a throttling measurement: bhagavatam hardware check --sustained-minutes 20
+    sanity_overfit_steps: 6
+    lora: {r: 16, alpha: 32, dropout: 0.0}

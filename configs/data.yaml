@@ -1,0 +1,34 @@
+data:
+  manifest: data/manifests/sources.yaml
+  expected_structure: data/reference/expected_structure.json
+  # Defence in depth: never fetch from these domains, whatever the manifest says.
+  # BBT / Prabhupada copyrighted text, and sites whose terms prohibit AI ingestion.
+  blocked_domains:
+    - vedabase.io
+    - vedabase.com
+    - bbt.org
+    - bbt.info
+    - bbtmedia.com
+    - prabhupadabooks.com
+    - sanskritdocuments.org
+    - grantha.jiva.org
+    - granthamandira.com
+  download:
+    timeout_s: 60
+    max_retries: 4
+    backoff_s: 2.0
+    polite_delay_s: 1.5
+    respect_robots_txt: true
+    user_agent: "bhagavatam-ai-data-pipeline/0.1 (research; non-commercial)"
+  split:
+    seed: 20261118
+    val_fraction: 0.05
+    forced_val_chapters: []
+  dedup:
+    shingle_size: 5
+    num_perm: 64
+    bands: 16
+    near_duplicate_threshold: 0.85
+  validation:
+    fail_on_error: true
+    min_chars_per_verse: 8

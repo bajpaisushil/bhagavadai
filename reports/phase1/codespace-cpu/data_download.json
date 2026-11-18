@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "report": "data_download",
+    "run_id": "20261118T085121Z-8a1410",
+    "created_utc": "2026-11-18T08:51:23+00:00",
+    "package_version": "0.1.0",
+    "git": {
+      "commit": "9d8fab7e7127f9551f52dcafa498f4e59a3672ed",
+      "dirty": true
+    }
+  },
+  "files": [
+    {
+      "source_id": "gretil-bhagavata-purana",
+      "url": "https://gretil.sub.uni-goettingen.de/gretil/corpustei/sa_bhAgavatapurANa.xml",
+      "file": "sa_bhAgavatapurANa.xml",
+      "status": "downloaded",
+      "sha256": "5b4271b0703cb1ad21c97142e7366a61de608988c6073464eef0749bcfa20d43",
+      "bytes": 2600905,
+      "http_status": 200,
+      "content_type": "application/xml",
+      "last_modified": "Thu, 10 Sep 2020 15:46:57 GMT",
+      "retrieved_utc": "2026-11-18T08:51:23+00:00"
+    }
+  ]
+}

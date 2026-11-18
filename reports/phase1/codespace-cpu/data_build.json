@@ -1,0 +1,469 @@
+{
+  "_meta": {
+    "report": "data_build",
+    "run_id": "20261118T091657Z-19d82b",
+    "created_utc": "2026-11-18T09:17:01+00:00",
+    "package_version": "0.1.0",
+    "git": {
+      "commit": "9d8fab7e7127f9551f52dcafa498f4e59a3672ed",
+      "dirty": true
+    }
+  },
+  "parsed": [
+    {
+      "source_id": "gretil-bhagavata-purana",
+      "parser": "gretil_tei_bhp",
+      "parser_version": "1.1.0",
+      "raw_file": "data/raw/gretil-bhagavata-purana/sa_bhAgavatapurANa.xml",
+      "raw_sha256": "5b4271b0703cb1ad21c97142e7366a61de608988c6073464eef0749bcfa20d43",
+      "records": 14099,
+      "chapters": 335,
+      "records_per_canto": {
+        "1": 813,
+        "2": 391,
+        "3": 1413,
+        "4": 1449,
+        "5": 663,
+        "6": 851,
+        "7": 750,
+        "8": 933,
+        "9": 965,
+        "10": 3940,
+        "11": 1366,
+        "12": 565
+      },
+      "duplicate_lines_removed": 584,
+      "labels_repaired": 30,
+      "duplicate_refs": 5,
+      "explicit_speakers": 1332,
+      "speaker_label_mismatches": [
+        "speaker at line 21198 labelled (3, 17, 2) precedes lines 21202-21205",
+        "speaker at line 28112 labelled (3, 30, 1) precedes lines 28116-28119",
+        "speaker at line 39756 labelled (4, 21, 45) precedes lines 39760-39763",
+        "speaker at line 46079 labelled (5, 1, 1) precedes lines 46080-46080",
+        "speaker at line 60458 labelled (7, 5, 44) precedes lines 60462-60465",
+        "speaker at line 67496 labelled (8, 3, 3) precedes lines 67500-67503",
+        "speaker at line 117045 labelled (10, 62, 16) precedes lines 117049-117052"
+      ]
+    }
+  ],
+  "validation": [
+    {
+      "source_id": "gretil-bhagavata-purana",
+      "records": 14099,
+      "ok": true,
+      "counts": {
+        "error": 0,
+        "warning": 10,
+        "info": 106
+      },
+      "issues": {
+        "LENGTH_OUTLIER": {
+          "severity": "info",
+          "count": 92,
+          "examples": [
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "531 chars (mean 106)",
+              "ref": "4.29.54"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "428 chars (mean 106)",
+              "ref": "5.1.6"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "309 chars (mean 106)",
+              "ref": "5.1.27"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "367 chars (mean 106)",
+              "ref": "5.1.29"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "300 chars (mean 106)",
+              "ref": "5.1.30"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "439 chars (mean 106)",
+              "ref": "5.2.6"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "310 chars (mean 106)",
+              "ref": "5.3.2"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "399 chars (mean 106)",
+              "ref": "5.3.3"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "301 chars (mean 106)",
+              "ref": "5.3.4"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "276 chars (mean 106)",
+              "ref": "5.4.8"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "284 chars (mean 106)",
+              "ref": "5.4.14"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "459 chars (mean 106)",
+              "ref": "5.5.28"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "430 chars (mean 106)",
+              "ref": "5.5.30"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "413 chars (mean 106)",
+              "ref": "5.5.31"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "339 chars (mean 106)",
+              "ref": "5.5.35"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "265 chars (mean 106)",
+              "ref": "5.6.7"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "271 chars (mean 106)",
+              "ref": "5.6.10"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "289 chars (mean 106)",
+              "ref": "5.6.16"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "354 chars (mean 106)",
+              "ref": "5.7.6"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "278 chars (mean 106)",
+              "ref": "5.7.7"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "380 chars (mean 106)",
+              "ref": "5.7.12"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "337 chars (mean 106)",
+              "ref": "5.8.9"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "285 chars (mean 106)",
+              "ref": "5.8.23"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "464 chars (mean 106)",
+              "ref": "5.8.26"
+            },
+            {
+              "severity": "info",
+              "code": "LENGTH_OUTLIER",
+              "message": "330 chars (mean 106)",
+              "ref": "5.8.29"
+            }
+          ]
+        },
+        "ORDER": {
+          "severity": "warning",
+          "count": 1,
+          "examples": [
+            {
+              "severity": "warning",
+              "code": "ORDER",
+              "message": "1 records are out of canonical order",
+              "ref": null
+            }
+          ]
+        },
+        "REPEATED_TEXT": {
+          "severity": "info",
+          "count": 14,
+          "examples": [
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['3.9.17', '10.70.26']",
+              "ref": "3.9.17"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['3.27.4', '4.29.73', '11.22.56', '11.28.13']",
+              "ref": "3.27.4"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['3.27.25', '11.28.14']",
+              "ref": "3.27.25"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['3.29.45', '4.11.19']",
+              "ref": "3.29.45"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['7.10.48', '7.15.75']",
+              "ref": "7.10.48"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['7.10.49', '7.15.76']",
+              "ref": "7.10.49"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['7.10.50', '7.15.77']",
+              "ref": "7.10.50"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['10.8.16', '10.26.19']",
+              "ref": "10.8.16"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['10.8.17', '10.26.20']",
+              "ref": "10.8.17"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['10.11.59', '10.14.61']",
+              "ref": "10.11.59"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['10.23.10', '10.23.48']",
+              "ref": "10.23.10"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['10.23.33', '10.29.27']",
+              "ref": "10.23.33"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['10.48.31', '10.84.11']",
+              "ref": "10.48.31"
+            },
+            {
+              "severity": "info",
+              "code": "REPEATED_TEXT",
+              "message": "identical text at ['10.89.55', '10.89.56']",
+              "ref": "10.89.55"
+            }
+          ]
+        },
+        "REPEATED_VERSE_NUMBER": {
+          "severity": "warning",
+          "count": 5,
+          "examples": [
+            {
+              "severity": "warning",
+              "code": "REPEATED_VERSE_NUMBER",
+              "message": "edition repeats this verse number",
+              "ref": "4.29.46"
+            },
+            {
+              "severity": "warning",
+              "code": "REPEATED_VERSE_NUMBER",
+              "message": "edition repeats this verse number",
+              "ref": "4.29.47"
+            },
+            {
+              "severity": "warning",
+              "code": "REPEATED_VERSE_NUMBER",
+              "message": "edition repeats this verse number",
+              "ref": "4.29.76"
+            },
+            {
+              "severity": "warning",
+              "code": "REPEATED_VERSE_NUMBER",
+              "message": "edition repeats this verse number",
+              "ref": "4.29.77"
+            },
+            {
+              "severity": "warning",
+              "code": "REPEATED_VERSE_NUMBER",
+              "message": "edition repeats this verse number",
+              "ref": "5.26.2"
+            }
+          ]
+        },
+        "VERSE_GAP": {
+          "severity": "warning",
+          "count": 4,
+          "examples": [
+            {
+              "severity": "warning",
+              "code": "VERSE_GAP",
+              "message": "missing verse numbers [33]",
+              "ref": "3.25"
+            },
+            {
+              "severity": "warning",
+              "code": "VERSE_GAP",
+              "message": "missing verse numbers [45]",
+              "ref": "4.21"
+            },
+            {
+              "severity": "warning",
+              "code": "VERSE_GAP",
+              "message": "missing verse numbers [5]",
+              "ref": "8.7"
+            },
+            {
+              "severity": "warning",
+              "code": "VERSE_GAP",
+              "message": "missing verse numbers [13]",
+              "ref": "11.11"
+            }
+          ]
+        }
+      },
+      "stats": {
+        "chapters": 335,
+        "cantos": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "chars": {
+          "total": 1494152,
+          "mean": 106.0,
+          "stdev": 31.3
+        },
+        "identical_text_groups": 14,
+        "speakers": {
+          "explicit_attributions": 1332,
+          "records_with_speaker_label": 14093,
+          "records_with_canonical_speaker": 13118,
+          "ambiguous": 975,
+          "unmapped_keys": {}
+        },
+        "flags": {
+          "speaker_carried_forward": 12761,
+          "speaker_ambiguous": 975,
+          "metre_markup_converted": 844,
+          "long_metre": 844,
+          "duplicate_line_removed": 584,
+          "prose": 470,
+          "label_repaired": 30,
+          "duplicate_ref": 5,
+          "stray_char_removed": 1
+        }
+      }
+    }
+  ],
+  "dataset_card": {
+    "name": "bhagavatam-cpt",
+    "split_plan": {
+      "seed": 20261118,
+      "val_fraction": 0.05,
+      "val_chapters": [
+        "1.14",
+        "2.1",
+        "3.10",
+        "3.23",
+        "4.14",
+        "4.21",
+        "5.23",
+        "6.17",
+        "7.10",
+        "8.17",
+        "9.20",
+        "10.29",
+        "10.31",
+        "10.48",
+        "10.54",
+        "11.6",
+        "11.13",
+        "12.3"
+      ]
+    },
+    "sources": [],
+    "records": {
+      "train": 0,
+      "val": 0
+    },
+    "characters": {
+      "train": 0,
+      "val": 0
+    },
+    "leakage": {
+      "note": "not computed: a split is empty"
+    },
+    "note": "No source is cleared for training_text yet: the corpus is intentionally empty until a public-domain or properly licensed English translation is verified and added to the manifest."
+  }
+}

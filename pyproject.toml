@@ -1,0 +1,150 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bhagavatam-ai"
+version = "0.1.0"
+description = "An English conversational LLM adapted (continued pretraining + SFT) on properly licensed Srimad-Bhagavatam text."
+readme = "README.md"
+requires-python = ">=3.11"
+keywords = ["llm", "fine-tuning", "continued-pretraining", "lora", "bhagavata-purana", "sanskrit"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    # Prevents accidental uploads to PyPI.
+    "Private :: Do Not Upload",
+]
+# Core dependencies: configuration, data pipeline and reporting. No ML framework here,
+# so the data pipeline and CI lint/tests stay light.
+dependencies = [
+    "pydantic>=2.7,<3",
+    "pyyaml>=6.0.1",
+    "httpx>=0.27",
+    "psutil>=6.0",
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+# Model loading, hardware checks, training and inference.
+ml = [
+    # torch 2.15: fixes M5-specific corrupted bf16 F.linear (>=2.13) and bf16 AdamW lerp_ (2.15),
+    # and adds the fast MPS triangular solve used by the Gated DeltaNet reference path.
+    "torch>=2.15",
+    # 5.23 is the newest release; main already renames cache kwargs (breaking).
+    "transformers>=5.23,<5.24",
+    "peft>=0.21.3,<1",
+    "accelerate>=1.10",
+    "safetensors>=0.6",
+    "huggingface-hub>=1.0",
+]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.15",
+    "mypy>=1.15",
+    "types-PyYAML>=6.0",
+    "pre-commit>=4.0",
+]
+
+[project.scripts]
+bhagavatam = "bhagavatam_ai.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bhagavatam_ai"]
+
+# ---------------------------------------------------------------------------
+# uv: one lockfile for Apple Silicon (MPS-enabled torch from PyPI) and Linux
+# (CPU-only torch wheels for CI / codespaces / CPU Spaces).
+# ---------------------------------------------------------------------------
+[tool.uv]
+environments = [
+    "sys_platform == 'darwin' and platform_machine == 'arm64'",
+    "sys_platform == 'linux'",
+]
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+# ---------------------------------------------------------------------------
+# Lint / format
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "B", "UP", "SIM", "C4", "PIE", "RET", "RUF", "N",
+    "PTH", "PL", "TID", "PERF", "LOG", "G", "T20", "DTZ",
+]
+ignore = [
+    "PLR0913",  # many-arguments: config-heavy ML functions
+    "PLR2004",  # magic values: thresholds live next to their checks
+    "RUF001",   # ambiguous unicode: IAST diacritics are intentional
+    "RUF002",
+    "RUF003",
+    "PLC0415",  # import-outside-toplevel: torch/transformers are imported lazily on purpose
+    "N812",     # `import torch.nn.functional as F` is the universal PyTorch convention
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PLR0913", "PLR2004", "T20", "PLC2701"]
+"src/bhagavatam_ai/cli.py" = ["T20"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+# ---------------------------------------------------------------------------
+# Type checking
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unreachable = true
+mypy_path = "src"
+packages = ["bhagavatam_ai"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# Heavy third-party ML libraries: treat as untyped to keep strict mode useful for our code.
+module = ["transformers", "transformers.*", "peft", "peft.*", "accelerate.*", "safetensors.*", "huggingface_hub.*", "psutil", "psutil.*"]
+ignore_missing_imports = true
+follow_imports = "skip"
+
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+filterwarnings = [
+    # Raised inside PEFT/transformers internals (we call activation_checkpointing_enable ourselves).
+    "ignore:`is_gradient_checkpointing` is deprecated:FutureWarning",
+]
+markers = [
+    "model: loads the real model weights (opt-in: --run-model or BHAGAVATAM_RUN_MODEL_TESTS=1)",
+    "network: needs internet access (opt-in: --run-network or BHAGAVATAM_RUN_NETWORK_TESTS=1)",
+]
+
+[tool.coverage.run]
+source = ["bhagavatam_ai"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "@overload"]

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Format-faithful TEST FIXTURE. The "verse" text is placeholder syllables, not scripture. -->
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+<teiHeader><fileDesc><titleStmt><title>Test fixture</title></titleStmt>
+<publicationStmt><availability><licence target="https://creativecommons.org/licenses/by-nc-sa/4.0/">Test licence line.</licence></availability></publicationStmt>
+</fileDesc></teiHeader>
+<text><body>
+<lg><l>ka kha ga /</l>
+<l>gha ṅa ca // BhP_01.01.001 //</l></lg>
+<p>BhP_01.01.002/0 śrī-śuka uvāca
+<lg><l>ta tha $ da dha &amp;amp;</l>
+<l>ta tha $ da dha &amp;amp;</l>
+<l>na pa % pha ba // BhP_01.01.002* //</l></lg></p>
+<lg><l>bha ma /</l>
+<l>ya ra // BhP_01.01.003 //</l></lg>
+la va śa ṣa sa ha prose line // BhP_01.01.004 //_*
+<lg><l>kṣa tra /</l>
+<l>jña śra // BhP_01.02.005 //</l></lg>
+<lg><l>ā ī /</l>
+<l>ū ṛ // BhP_01.02.001 //</l></lg>
+BhP_01.02.002/0
+sūta uvāca
+<lg><l>e ai /</l>
+<l>o au // BhP_01.02.002 //</l></lg>
+<lg><l>ṃ ḥ /</l>
+<l>ka ki // BhP_01.02.002 //</l></lg>
+<lg><l>ku ke // BhP_01.02.003_1 //</l></lg>
+<lg><l>ko kau # // BhP_01.02.003_2 //</l></lg>
+</body></text></TEI>

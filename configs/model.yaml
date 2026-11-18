@@ -1,0 +1,30 @@
+# Base model. The revision is pinned to a commit so every run loads identical weights.
+model:
+  name_or_path: Qwen/Qwen3.5-0.8B-Base
+  revision: dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68
+  attn_implementation: sdpa
+  dtype:
+    mps: bfloat16   # fp16 underflows gradients in the Gated DeltaNet reference path (see hardware op checks)
+    cuda: bfloat16
+    cpu: float32    # CPUs without AVX512-BF16 emulate bf16 very slowly
+  expected:
+    model_class: Qwen3_5ForCausalLM
+    num_hidden_layers: 24
+    vocab_size: 248320
+    tie_word_embeddings: true
+    # The vision tower and multi-token-prediction head are intentionally not loaded.
+    allowed_unexpected_key_patterns: ['^mtp\.', '^model\.visual\.']
+    checkpoint_key_prefix: model.language_model.
+    integrity_spot_check_keys:
+      - model.embed_tokens.weight
+      - model.layers.0.linear_attn.in_proj_qkv.weight
+      - model.layers.0.linear_attn.A_log
+      - model.layers.3.self_attn.q_proj.weight
+      - model.layers.23.mlp.down_proj.weight
+      - model.norm.weight
+  # nn.Linear modules in the text decoder (verified by inspecting the loaded model):
+  #   Gated DeltaNet (18 layers): in_proj_qkv, in_proj_z, in_proj_a, in_proj_b, out_proj
+  #   gated full attention (6 layers): q_proj, k_proj, v_proj, o_proj
+  #   MLP (24 layers): gate_proj, up_proj, down_proj
+  # in_proj_a / in_proj_b (1024 -> 16) are too small to benefit from LoRA and are left frozen.
+  lora_target_modules: [q_proj, k_proj, v_proj, o_proj, in_proj_qkv, in_proj_z, out_proj, gate_proj, up_proj, down_proj]
