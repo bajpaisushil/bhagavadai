@@ -32,6 +32,28 @@ measure thermal throttling on the fanless Air.
 
 Without `make`/`uv`: `python3 -m venv .venv && .venv/bin/pip install -e ".[ml,dev]"` (Python ≥ 3.11).
 
+## Web demo
+
+A FastAPI backend (streaming over server-sent events) and a Next.js + TypeScript + Tailwind chat UI. It
+currently serves the **untrained base model**, which is labelled as such in the UI, so expect fluent but
+unreliable answers. After training, it serves the fine-tuned model via `bhagavatam serve --adapter <dir>`.
+
+```bash
+make setup          # Python deps, once
+make demo           # API on :8000 + web UI on :3000 (installs the UI's npm deps on first run)
+```
+
+Open http://localhost:3000. In **GitHub Codespaces**, open the *Ports* tab and use *Open in Browser* on
+port 3000; the UI proxies `/api` to the backend, so only that one port is needed. The model loads in
+the background (~20 s); the badge shows "Loading model…" until it is ready. Generation is ~3–4
+tokens/s on a 2-vCPU codespace and much faster on Apple Silicon.
+
+Run the pieces separately with `make api` and `make web`. Interactive API docs are at
+http://localhost:8000/api/docs. Endpoints: `GET /api/health`, `GET /api/info`, `POST /api/chat`, and
+`POST /api/chat/stream`. The server runs one generation at a time (a concurrent request gets a 503 with
+`Retry-After`) and stops generating if the client disconnects. Conversations are stored only in the
+browser.
+
 ## Commands
 
 | Command | What it does |
@@ -45,6 +67,7 @@ Without `make`/`uv`: `python3 -m venv .venv && .venv/bin/pip install -e ".[ml,de
 | `bhagavatam data manifest` | Validate and list the source/licence manifest |
 | `bhagavatam data download` | Download raw files, only for sources whose licence permits it |
 | `bhagavatam data build` | Parse, normalise, validate, then build the licence-gated training corpus |
+| `bhagavatam serve` | Chat API used by the web demo (`--adapter` to serve a fine-tuned model later) |
 
 Every command writes a JSON report to `reports/<command>/<run_id>.json` (and `latest.json`) with the git
 commit and package version. Exit codes: `0` success, `1` error, `2` checks ran but failed.
@@ -115,7 +138,9 @@ src/bhagavatam_ai/
   hardware/            device + environment, memory (unified-memory aware), op checks, benchmark
   modeling/            integrity-verified loader, LoRA wiring, tokenizer inspection
   training/            memory-efficient losses (Phase 2+: continued pretraining, SFT)
-  inference/           generation helpers, smoke test (Phase 5: API)
+  inference/           generation helpers, smoke test
+  api/                 FastAPI app: health/info, chat (JSON + SSE streaming), cancellation on disconnect
+frontend/              Next.js 16 + React 19 + Tailwind 4 chat UI (proxies /api to the backend)
 tests/unit/            fast tests (run in CI); tiny random Qwen3.5 for training-path tests
 tests/integration/     real-model tests (opt-in: --run-model)
 scripts/mac_phase1.sh  one-command Phase 1 run on the Mac

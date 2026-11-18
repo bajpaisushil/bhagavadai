@@ -9,13 +9,13 @@ CAFFEINATE := $(shell command -v caffeinate >/dev/null 2>&1 && echo caffeinate -
 
 .PHONY: help setup lock lint format typecheck test test-model check env model-download model-inspect \
         model-smoke hardware-ops hardware-check hardware-check-sustained data-download data-build \
-        data-validate phase1 clean
+        data-validate phase1 api web web-install demo clean
 
 help: ## List targets
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-26s\033[0m %s\n", $$1, $$2}'
 
 setup: ## Install locked dependencies (ml + dev extras) and git hooks
-	$(UV) sync --frozen --extra ml --extra dev
+	$(UV) sync --frozen --extra ml --extra dev --extra api
 	$(RUN) pre-commit install
 
 lock: ## Re-resolve uv.lock after editing dependencies
@@ -71,6 +71,22 @@ data-validate: ## Re-run validation on parsed data
 	$(BHAGAVATAM) data validate
 
 phase1: env model-download model-inspect hardware-check model-smoke data-download data-build ## Full Phase 1 sequence
+
+api: ## Chat API on :8000 (model loads in the background; docs at /api/docs)
+	$(BHAGAVATAM) serve --port 8000
+
+web-install: ## Install the web UI's locked dependencies
+	cd frontend && npm ci
+
+web: ## Web UI on :3000 (dev mode; proxies /api to :8000)
+	cd frontend && npm run dev -- -p 3000
+
+demo: ## API + web UI together; then open http://localhost:3000 (Ctrl+C stops both)
+	@test -d frontend/node_modules || (cd frontend && npm ci)
+	@trap 'kill 0' INT TERM EXIT; \
+	$(BHAGAVATAM) serve --port 8000 & \
+	(cd frontend && npm run dev -- -p 3000) & \
+	wait
 
 clean: ## Remove caches (keeps data, reports, checkpoints)
 	rm -rf .pytest_cache .mypy_cache .ruff_cache .coverage htmlcov

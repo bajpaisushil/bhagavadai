@@ -32,7 +32,7 @@ jobs:
           version: "0.13.9"
           python-version: "3.12"
           enable-cache: true
-      - run: uv sync --frozen --extra ml --extra dev
+      - run: uv sync --frozen --extra ml --extra dev --extra api
       - run: uv run --frozen --no-sync ruff check src tests
       - run: uv run --frozen --no-sync ruff format --check src tests
       - run: uv run --frozen --no-sync mypy
@@ -53,10 +53,31 @@ jobs:
           version: "0.13.9"
           python-version: ${{ matrix.python }}
           enable-cache: true
-      - run: uv sync --frozen --extra ml --extra dev
+      - run: uv sync --frozen --extra ml --extra dev --extra api
       - name: Interpreter actually in use
         run: uv run --frozen --no-sync python -c "import sys, torch; print(sys.version, torch.__version__)"
       - run: uv run --frozen --no-sync pytest --cov --cov-report=term-missing
+
+  web:
+    name: Web UI (lint, types, tests, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
 
   model-integration:
     name: Real-model integration (CPU)
@@ -74,7 +95,7 @@ jobs:
         with:
           path: ~/.cache/huggingface
           key: hf-${{ hashFiles('configs/model.yaml') }}
-      - run: uv sync --frozen --extra ml --extra dev
+      - run: uv sync --frozen --extra ml --extra dev --extra api
       - run: uv run --frozen --no-sync bhagavatam model download
       - run: uv run --frozen --no-sync pytest tests/integration --run-model -q
       - run: uv run --frozen --no-sync bhagavatam hardware check --config configs/hardware.cpu-smoke.yaml

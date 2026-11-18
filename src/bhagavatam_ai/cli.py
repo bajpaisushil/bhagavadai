@@ -222,6 +222,35 @@ def cmd_hardware_check(rt: Runtime) -> int:
     return EXIT_OK
 
 
+# --------------------------------------------------------------------------- serve
+
+
+def cmd_serve(rt: Runtime) -> int:
+    import uvicorn
+
+    from bhagavatam_ai.api.app import ApiSettings, create_app
+    from bhagavatam_ai.api.service import TransformersChatService
+
+    settings = ApiSettings(
+        model_config=rt.paths.configs / "model.yaml",
+        device=rt.args.device,
+        adapter=rt.paths.resolve(rt.args.adapter) if rt.args.adapter else None,
+        cors_origins=rt.args.cors_origin or [],
+    )
+
+    def factory() -> TransformersChatService:
+        return TransformersChatService(
+            settings.model_config, device=settings.device, adapter=settings.adapter
+        )
+
+    print(
+        f"Serving on http://{rt.args.host}:{rt.args.port} (docs: /api/docs); "
+        "the model loads in the background."
+    )
+    uvicorn.run(create_app(factory, settings), host=rt.args.host, port=rt.args.port, log_level="info")
+    return EXIT_OK
+
+
 # --------------------------------------------------------------------------- data
 
 
@@ -351,18 +380,12 @@ def cmd_data_build(rt: Runtime) -> int:
 # --------------------------------------------------------------------------- parser
 
 
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="bhagavatam", description="Bhagavatam AI command-line tools")
-    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
-    parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
-    parser.add_argument("--log-json", action="store_true", help="JSON log lines on stderr")
-    parser.add_argument("--log-file", type=Path, help="also write JSON logs to this file")
-    parser.add_argument("--reports-dir", help="where reports are written (default: reports/)")
-    groups = parser.add_subparsers(dest="group", required=True)
+Subparsers = Any  # argparse's _SubParsersAction is private
 
-    env = groups.add_parser("env", help="describe OS, hardware and library versions")
-    env.set_defaults(func=cmd_env)
+DEVICES = ["auto", "mps", "cuda", "cpu"]
 
+
+def _add_model_commands(groups: Subparsers) -> None:
     model = groups.add_parser("model", help="download / inspect / smoke-test the base model").add_subparsers(
         dest="command", required=True
     )
@@ -373,23 +396,25 @@ def build_parser() -> argparse.ArgumentParser:
     inspect_p.add_argument("--offline", action="store_true", help="use the local cache only")
     inspect_p.set_defaults(func=cmd_model_inspect)
     smoke = model.add_parser("smoke", help="small end-to-end inference test")
-    smoke.add_argument("--device", default="auto", choices=["auto", "mps", "cuda", "cpu"])
+    smoke.add_argument("--device", default="auto", choices=DEVICES)
     smoke.add_argument("--max-new-tokens", type=int, default=64)
     smoke.add_argument("--offline", action="store_true")
     smoke.set_defaults(func=cmd_model_smoke)
 
+
+def _add_hardware_commands(groups: Subparsers) -> None:
     hw = groups.add_parser("hardware", help="hardware compatibility and performance checks").add_subparsers(
         dest="command", required=True
     )
     ops = hw.add_parser("ops", help="op-level backend compatibility checks (fast)")
     ops.add_argument("--config", help="hardware config (default configs/hardware.yaml)")
-    ops.add_argument("--device", choices=["auto", "mps", "cuda", "cpu"])
+    ops.add_argument("--device", choices=DEVICES)
     ops.set_defaults(func=cmd_hardware_ops)
     check = hw.add_parser(
         "check", help="full check: ops, load, numerics, generation, LoRA training memory/speed"
     )
     check.add_argument("--config", help="hardware config (default configs/hardware.yaml)")
-    check.add_argument("--device", choices=["auto", "mps", "cuda", "cpu"])
+    check.add_argument("--device", choices=DEVICES)
     check.add_argument("--skip-training", action="store_true")
     check.add_argument("--sustained-minutes", type=float, help="add a sustained run to measure throttling")
     check.add_argument(
@@ -399,6 +424,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     check.set_defaults(func=cmd_hardware_check)
 
+
+def _add_serve_command(groups: Subparsers) -> None:
+    serve = groups.add_parser("serve", help="run the chat API (used by the web demo)")
+    serve.add_argument("--host", default="127.0.0.1", help="bind address (default: localhost only)")
+    serve.add_argument("--port", type=int, default=8000)
+    serve.add_argument("--device", default="auto", choices=DEVICES)
+    serve.add_argument("--adapter", help="LoRA adapter directory to apply (after training)")
+    serve.add_argument("--cors-origin", action="append", help="allowed browser origin (repeatable)")
+    serve.set_defaults(func=cmd_serve)
+
+
+def _add_data_commands(groups: Subparsers) -> None:
     data = groups.add_parser("data", help="licence-gated dataset pipeline").add_subparsers(
         dest="command", required=True
     )
@@ -424,6 +461,21 @@ def build_parser() -> argparse.ArgumentParser:
     ref.add_argument("--config")
     ref.add_argument("--source", required=True)
     ref.set_defaults(func=cmd_data_reference)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="bhagavatam", description="Bhagavatam AI command-line tools")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
+    parser.add_argument("--log-json", action="store_true", help="JSON log lines on stderr")
+    parser.add_argument("--log-file", type=Path, help="also write JSON logs to this file")
+    parser.add_argument("--reports-dir", help="where reports are written (default: reports/)")
+    groups = parser.add_subparsers(dest="group", required=True)
+    groups.add_parser("env", help="describe OS, hardware and library versions").set_defaults(func=cmd_env)
+    _add_model_commands(groups)
+    _add_hardware_commands(groups)
+    _add_serve_command(groups)
+    _add_data_commands(groups)
     return parser
 
 

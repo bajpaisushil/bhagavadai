@@ -12,7 +12,7 @@ cd "$(dirname "$0")/.."
 [[ "$(uname -m)" == "arm64" ]] || { echo "error: shell is not arm64 (Rosetta?); MPS needs native arm64" >&2; exit 1; }
 command -v uv >/dev/null || { echo "error: install uv first: brew install uv" >&2; exit 1; }
 
-uv sync --frozen --extra ml --extra dev
+uv sync --frozen --extra ml --extra dev --extra api
 uv run --frozen python - <<'PY'
 import platform, torch
 assert platform.machine() == "arm64", f"Python is {platform.machine()}, need native arm64"
