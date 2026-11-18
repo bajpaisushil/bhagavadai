@@ -156,3 +156,676 @@ sources:
     original_source_urls: [https://grantha.jiva.org/]
     risks: ["No licence; probable BBT origin."]
     reviewed_on: 2026-11-18
+
+  # ------------------------------------------------------------------ English and other sources
+  # Generated from the 2026-11-18 research (evidence quoted verbatim); review_status is updated
+  # when adversarial verification of a source completes.
+  - id: dutt-1895-english
+    title: A Prose English Translation of Srimadbhagavatam (Shrimadbhagabatam), Books I-XII
+    author_translator: Manmatha Nath Dutt (editor/translator, 1855-1912)
+    language: en
+    content_roles:
+    - english_translation
+    edition: 'Calcutta: H. C. Dass, Elysium Press (Dutt''s ''Wealth of India'' series), 1895-1896; 12 books, often
+      bound as 2 volumes (Books 1-7, 8-12)'
+    publication_years: 1895-1896
+    copyright_holder: None (public domain)
+    license: Public domain (published Calcutta 1895-96; translator died 1912)
+    attribution_requirements: None legally; suggested credit 'Manmatha Nath Dutt, A Prose English Translation of Srimadbhagavatam,
+      Calcutta 1895-96'.
+    evidence:
+    - url: https://archive.org/download/proseenglishtran12dutt/proseenglishtran12dutt_djvu.txt
+      quote: 'EDITED AND PUBLISHED BY MANMATHA NATH BUTT, M A., M.R.A.S., ... CALCUTTA: Printed by H. C. Dass, Elysium
+        Press, 65/2 Beadon Street. [year OCR''d as 1805 = 1895] ... Calcutta, July, 1896. M. N. D.'
+      retrieved_on: '2026-11-18'
+    - url: https://en.wikipedia.org/wiki/Manmatha_Nath_Dutt
+      quote: Manmatha Nath Dutt (Pabna, British India 1855–1912) was a prolific translator of ancient Hindu texts
+        to English.
+      retrieved_on: '2026-11-18'
+    - url: https://books.google.com/books/about/A_Prose_English_Translation_of_Srimadbha.html?id=RQQ-AQAAMAAJ
+      quote: Download EPUB Download PDF Read eBook ... A Prose English Translation of Srimadbhagavatam, Volumes 8-12
+        ... Publisher M.N. Dutt, 1896 Original from UC Southern Regional Library Facility Digitized 1 Nov 2013
+      retrieved_on: '2026-11-18'
+    coverage: 'Complete Bhagavata (Books I-XII) in print. Verified on archive.org: Books I-IX complete plus Book X
+      ch. 1-5. Book X ch. 6-90, XI and XII are only in the Google Books RQQ-AQAAMAAJ scan.'
+    risks:
+    - archive.org copies lack Book X ch. 6-90, XI and XII; completing the set needs the Google Books or HathiTrust
+      scan, and the Google download sits behind a CAPTCHA (scripted scraping may breach Google's terms)
+    - No verse numbers, so verse-level alignment with the Sanskrit must be done automatically (chapter-level alignment
+      is easy)
+    - 'OCR noise: garbled drop caps (''T jet us'', ''JuET us'', ''1 HE''), ''0'' for ''O'', running heads and page
+      numbers interleaved; item 40625 must be re-ordered and de-duplicated'
+    - Dutt admits some passages are rendered freely; Victorian diction
+    - Reprints after 1977 may carry new copyright on added material; use only the 1895-96 scans
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    license_url: null
+    commercial_use: allowed
+    ml_training: allowed
+    permission_status: public_domain
+    usage:
+      download: true
+      metadata: true
+    original_source_urls:
+    - https://archive.org/details/in.ernet.dli.2015.272582
+    - https://books.google.com/books?id=RQQ-AQAAMAAJ
+    downloads:
+    - url: https://archive.org/download/in.ernet.dli.2015.272582/2015.272582.Shrimad-Bhagwatam_djvu.txt
+      filename: dli-272582-books-1-7_djvu.txt
+      format: djvu-ocr-text
+      sha256: 102386d85e360390add3fca1158f9d9ec51d67b37af8587b507cf298ebeb4436
+      notes: Books I-VII (Digital Library of India scan)
+    - url: https://archive.org/download/proseenglishtran12dutt/proseenglishtran12dutt_djvu.txt
+      filename: toronto-books-1-2_djvu.txt
+      format: djvu-ocr-text
+      sha256: a63056508adacc5d0c756fc9a8a150e46b86b7ff092278c3dd5520745f1735fd
+      notes: Books I-II (University of Toronto scan); cleanest OCR
+    - url: https://archive.org/download/india.history.resource.40625/40625_djvu.txt
+      filename: asiatic-40625-books-7-10_djvu.txt
+      format: djvu-ocr-text
+      sha256: 07ba02b9b9426b71d94d8a097781adf90586fa1f656214336df67701c3d3f0e1
+      notes: Books VII-IX and X ch. 1-5, pages out of order
+    notes: 'Primary English candidate. Public domain worldwide (published 1895-96; translator died 1912). Not yet
+      training_text: needs the Phase 1b parser (chapter segmentation, OCR clean-up), the missing Book X ch. 6-90,
+      XI, XII (Google Books full-view scan, to be downloaded manually), and completion of adversarial verification.
+      No verse numbers: chapter-level alignment only.'
+  - id: subba-rau-1928-english
+    title: Srimad Bhagavatam translated into easy English prose, embodying the interpretations of the three leading
+      schools of thought (Advaita, Visistadvaita and Dvaita), Vol. I (Skandhas 1 to 7)
+    author_translator: S. Subba Rau, M.A. (published by his son S. Lakshmana Rao)
+    language: en
+    content_roles:
+    - english_translation
+    edition: 'Tirupati: S. Lakshmana Rao, printed at Sri Vyasa Press, November 1928, Vol. I'
+    publication_years: '1928'
+    copyright_holder: none (public domain)
+    license: 'Public domain in the US (published November 1928). Status in India and the EU unverified: translator''s
+      death year unknown.'
+    attribution_requirements: none
+    evidence:
+    - url: https://archive.org/download/in.ernet.dli.2015.272624/2015.272624.Srimad-Bhagavatam_djvu.txt
+      quote: SRIMAD BHAGAVATAM TRANSLATED INTO EASY ENGLISH PROSE, embodying the interpretations of the Three leading
+        Schools of Thought, (Advaiia, Yisistadvaita and Dvaiia) S. SUBBA RAU, m. a., ... VOI-. I Skandhas 1 to 7 PUBLISHED
+        BY S. LAKSHMANA RAO. PRINTED AT vSFSI VYASA PRgSS,' TIRUPATI. All Bights B0served, ... November 1928.
+      retrieved_on: '2026-11-18'
+    - url: https://archive.org/metadata/in.ernet.dli.2015.272624
+      quote: 'dc.contributor.author: S. Subba Rau ... dc.date.citation: 1928 ... dc.description.totalpages: 976 ...
+        dc.publisher: S. Lakshmana Co. Tirupati'
+      retrieved_on: '2026-11-18'
+    coverage: Cantos 1-7 complete (Vol. I). Vol. II (Skandhas 8-12, Tirupati 1928) appears only in an Austrian Academy
+      of Sciences catalogue record seen as a search snippet; no digital copy found.
+    risks:
+    - Translator's death year unknown, so status in India and the EU is unverified
+    - Vol. II (Cantos 8-12) not found digitally
+    - Two-column footnotes interleave with the verse text and need cleanup
+    - Name OCR errors (Mauu, Akati, Euchi)
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: unclear
+    ml_training: unclear
+    permission_status: under_review
+    usage:
+      download: true
+      metadata: true
+    original_source_urls:
+    - https://archive.org/details/in.ernet.dli.2015.272624
+    downloads:
+    - url: https://archive.org/download/in.ernet.dli.2015.272624/2015.272624.Srimad-Bhagavatam_djvu.txt
+      filename: dli-272624-skandhas-1-7_djvu.txt
+      format: djvu-ocr-text
+      sha256: cecc92387802d33b0b0f30726949f2c7bdb86db376f5720f6bd694fff09da4ed
+      notes: Vol. I, Skandhas 1-7, verse-numbered
+    notes: Verse-numbered translation of Cantos 1-7 (follows Sridhara). Public domain in the US; India/EU status depends
+      on the translator's unknown death year, so not cleared for public weights.
+  - id: chatterjee-1895-english
+    title: The Çrīmadbhāgavatam, translated from the original Sanskrit, with notes and original text (Book I; Book
+      II held at HathiTrust)
+    author_translator: Mohendra Nath (Mohendranath) Chatterjee; published by Sasi Mohan Datta
+    language: en
+    content_roles:
+    - english_translation
+    - commentary
+    edition: 'Calcutta: S. M. Datta (Sasi Mohan Datta); London: Kegan Paul, Trench, Trübner; 1895-, 1st ed.'
+    publication_years: '1895'
+    copyright_holder: None in the US (public domain)
+    license: Public domain in the US (published 1895). HathiTrust marks the Oxford and Cornell copies 'pd' (public
+      domain everywhere); the Wellcome copy carries a Public Domain Mark. Translator's death year not verified.
+    attribution_requirements: none
+    evidence:
+    - url: https://catalog.hathitrust.org/api/volumes/full/oclc/8307370.json
+      quote: '245 The Çrīmadbhāgavatam / translated from the original Sanskrit by Mohendra Nath Chatterjee, with notes
+        and original text. 260 Calcutta : S.M. Datta, 1895- ; items: oxu1.602668567 (University of Oxford, bk.2) rightsCode
+        pd, Full view; oxu1.603257050 (bk.2) pd, Full view; nnc1.cr60125454 (Columbia) pdus, Full view'
+      retrieved_on: '2026-11-18'
+    - url: https://catalog.hathitrust.org/api/volumes/full/oclc/740272.json
+      quote: The Çrīmadbhāgavatam. Translated from the original Sanskrit by Mohendranath Chatterjee ... Calcutta;
+        sold by Kegan, Paul, Trench, Trübner, London, 1895- ; item coo1.ark:/13960/t97661k6q Cornell University v.1
+        rightsCode pd, Full view
+      retrieved_on: '2026-11-18'
+    - url: https://archive.org/metadata/b24879514
+      quote: This work is available under the Creative Commons, Public Domain Mark
+      retrieved_on: '2026-11-18'
+    coverage: Canto I complete; Canto II exists at HathiTrust (Oxford) only. No later books found.
+    risks:
+    - Notes are roughly 85-90% of the text; verse translations must be extracted
+    - OCR damages diacritics (£aunaka, Qajendra, Crtdhara) and inline note markers
+    - Translator's death year unverified (affects India/EU status only)
+    - Coverage is only Cantos I-II
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: unclear
+    ml_training: unclear
+    permission_status: under_review
+    usage:
+      download: true
+      metadata: true
+    original_source_urls:
+    - https://archive.org/details/in.ernet.dli.2015.217511
+    downloads:
+    - url: https://archive.org/download/in.ernet.dli.2015.217511/2015.217511.The-Crimadbhagavatam_djvu.txt
+      filename: dli-217511-book-1_djvu.txt
+      format: djvu-ocr-text
+      sha256: 29da56aef5673e687bcbc787426f1f5b59434770a92e34f783316e3f79502098
+      notes: Book I with Devanagari text, verse-numbered translation and notes
+    notes: Verse-numbered Canto 1 (Canto 2 at HathiTrust). HathiTrust marks copies 'pd'; translator's death year unverified.
+  - id: sanyal-1929-english
+    title: 'The Srimad-Bhagbatam [Srimad-Bhagabatam] of Krishna-Dwaipayana Vyasa, translated into English prose from
+      the original Sanskrit text. First edition: 26 parts bound as 5 vols, Calcutta/Dum Dum, 1929 to c.1939'
+    author_translator: '"J. M. Sanyal" (Mr. J. M. Sanyal). Full name and birth/death years NOT FOUND: LC NAF no96032320
+      reads only ''Sanyal, J. M.''; Open Library OL4188520A has no dates; no Wikidata entity. Foreword by N. K. Brahma,
+      M.A., P.R.S., Prof., Presidency College, Calcutta, dated 1 July 1929.'
+    language: en
+    content_roles:
+    - english_translation
+    edition: 'Calcutta: The Oriental Publishing Co. (proprietor Dhirendra Nath Bose; P.O. Beadon Street, later 11-D
+      Arpuli Lane), printed at the Joynarayan Press. From 1933 also ''Datta Bose & Co., Moti Jheel, P.O. Dum Dum (Bengal)'',
+      published by Dhirendranath Bose. Dated parts: Vol I part i 1929; part iii [1930]; part iv 1931; part v by Nov
+      1932; Vol II part vi 1932, parts vii-xi 1933; Vol III parts xii-xiii 1934, xiv-xvi 1934-35 (part XVI dated 1
+      July 1935); Vol IV parts xvii-xviii 1936 (whole volume out by Oct 1938); Vol V after Oct 1938, probably 1939
+      (DLI date 1941, unverified). Catalogue ranges vary: HathiTrust/Penn ''[1929]-[35?]''; British Museum per Singh''s
+      bibliography ''1929-1950''; National Library ''1936''; secondary bibliographies ''1929-39''.'
+    publication_years: 1929-c.1936
+    copyright_holder: Originally Dhirendra Nath Bose / The Oriental Publishing Co. and Datta Bose & Co. ('All rights
+      reserved to the Publisher'). Current holder unknown; the text was reissued by Oriental Publishing Co. in 1952-65
+      and licensed or reprinted by Munshiram Manoharlal from 1970 onwards (inferred).
+    license: 'None. Title verso: ''All rights reserved to the Publisher.'' No open licence exists. Public-domain status
+      is not established because the translator''s death year is unknown.'
+    attribution_requirements: 'None (no licence). If used as public domain, cite: J. M. Sanyal (tr.), The Srimad-Bhagbatam
+      of Krishna-Dwaipayana Vyasa, Calcutta: Oriental Publishing Co. / Dum Dum: Datta Bose & Co., 1929-c.1939.'
+    evidence:
+    - url: https://archive.org/details/in.ernet.dli.2015.112703
+      quote: 'Published by DHIRENDRA NATH BOSE Proprietor, THE ORIENTAL PUBLISHING COMPANY CALCUTTA. All rights reserved
+        to the Publisher. (OCR of the 1929 parts; prospectus: ''The work will be completed in 24 Parts, each Part
+        Re. 1/-'')'
+      retrieved_on: '2026-11-18'
+    - url: https://catalog.hathitrust.org/api/volumes/full/oclc/5575534.json
+      quote: 260 $a Calcutta, $b Oriental publishing company $c [1929]-[35?] ... 500 $a Appeared in 26 parts. ...
+        974 $u uc1.b3586073 $z v.1-2 $y 1935 $r ic $q bib $t non-US bib date2, date type m >= 1931 (HathiTrust Record
+        006679731)
+      retrieved_on: '2026-11-18'
+    - url: https://id.loc.gov/authorities/names/no96032320
+      quote: 'Sanyal, J. M. ... The Srimad-Bhagvatam of Krishna-Dwaipayana Vyasa, 1984: t.p. (J.M. Sanyal) (no dates
+        or full name)'
+      retrieved_on: '2026-11-18'
+    coverage: 'All 12 Books (335 chapters) across the five first-edition volumes on archive.org. Gaps: Vol V scan
+      ends mid-XII.13 (missing ~1-2 pages) and has ~4 upside-down pages. Vol III OCR needs redoing. Total first-edition
+      OCR is about 3.50M characters / ~577k words.'
+    risks:
+    - Translator's full name and death year unknown. In-copyright status in India and the EU (life+60) cannot be excluded,
+      and the stated aim of having model weights memorise the text raises exposure if the text is still protected.
+    - 'US: parts first published 1931-1939 are restored and protected until 2026-2034 unless the translator died by
+      1940; only the 1929-30 parts (about Books I-II) are confirmed US public domain.'
+    - Exact boundaries of the parts are inferred from pagination; Vol V's date (1938/39 vs DLI's 1941) is unverified.
+    - Publisher retained 'All rights reserved'; a successor rights holder (Oriental Publishing Co. / Munshiram Manoharlal)
+      may assert rights.
+    - DLI 'Out_of_copyright' / 'In Public Domain' labels and archive.org uploader CC0 tags are not evidence (e.g.
+      the June 1965 printing is labelled 'Out_of_copyright').
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: unclear
+    ml_training: unclear
+    permission_status: under_review
+    usage: {}
+    notes: 'Blocked: translator ''J. M. Sanyal'' unidentified (no death year), so India/EU terms cannot be computed;
+      only the 1929-30 parts are public domain in the US. Later editions excluded.'
+    downloads: []
+    original_source_urls: []
+  - id: sinha-1901-study
+    title: A Study of the Bhagavata Purana; or, Esoteric Hinduism
+    author_translator: Purnendu Narayana Sinha, M.A., B.L.
+    language: en
+    content_roles:
+    - commentary
+    edition: 'Benares: Freeman & Co., 1901'
+    publication_years: '1901'
+    copyright_holder: none (public domain)
+    license: Public domain in the US (1901); Project Gutenberg edition under Project Gutenberg terms. Worldwide status
+      unverified (HathiTrust 'pdus').
+    attribution_requirements: None legally; remove Project Gutenberg references or keep the Project Gutenberg licence
+      intact
+    evidence:
+    - url: http://mirrors.xmission.com/gutenberg/3/9/4/4/39442/39442-0.txt
+      quote: This eBook is for the use of anyone anywhere at no cost and with almost no restrictions whatsoever.
+      retrieved_on: '2026-11-18'
+    - url: http://mirrors.xmission.com/gutenberg/3/9/4/4/39442/39442-0.txt
+      quote: If an individual work is in the public domain in the United States and you are located in the United
+        States, we do not claim a right to prevent you from copying, distributing, performing, displaying or creating
+        derivative works based on the work as long as all references to Project Gutenberg are removed.
+      retrieved_on: '2026-11-18'
+    - url: https://archive.org/metadata/astudyofthebhaga00sinhuoft
+      quote: 'possible-copyright-status: NOT_IN_COPYRIGHT ... description: 436p; Abridgment of the text, with commentary
+        ... publisher: Benares Freeman ... date: 1901'
+      retrieved_on: '2026-11-18'
+    coverage: Abridged survey of all 12 cantos (selective).
+    risks:
+    - Theosophical/esoteric interpretation mixed with the narrative could bias the model
+    - Abridged paraphrase, not a translation
+    - Worldwide status unverified (HathiTrust 'pdus')
+    - Strip the Project Gutenberg header and footer and trademark
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: unclear
+    ml_training: unclear
+    permission_status: under_review
+    usage: {}
+    notes: A study with Theosophical interpretation, not a translation. If used, label as interpretation.
+    downloads: []
+    original_source_urls: []
+  - id: bhaktiratnavali-1912
+    title: 'The Bhaktiratnavali with the commentary of Visnu Puri (Sacred Books of the Hindus, Vol. VII: Bhakti Sastra)'
+    author_translator: '''A Professor of Sanskrit (Retired)'' (anonymous); series editor Major B. D. Basu; anthology
+      by Visnu Puri'
+    language: en
+    content_roles:
+    - english_translation
+    - commentary
+    edition: 'Allahabad: Panini Office, Bhuvaneswari Asrama, 1912 (SBH vol. VII)'
+    publication_years: '1912'
+    copyright_holder: none (public domain)
+    license: Public domain (1912; anonymous translator)
+    attribution_requirements: none
+    evidence:
+    - url: https://archive.org/download/sacredbooksofthehindusvol07bhaktiratnavalivishnupuri1912_202002/Sacred%20Books%20of%20the%20Hindus%20Vol%2007%20-%20Bhakti%20Ratnavali%20-%20Vishnu%20Puri%201912_djvu.txt
+      quote: THE BHAKITRATNAVALI WITH THE COMMENTARY OF VISNU PURl Translated by A PROFESSOR OF SANSKRIT, (Retired.)
+        Published by THB PANINI OFFICE, BHUVANESVaRI AERAMA, BAHADURGAW ... Printed by Apurva Krishna Bose,. 1912
+      retrieved_on: '2026-11-18'
+    - url: https://archive.org/metadata/in.ernet.dli.2015.282021
+      quote: 'dc.description.totalpages: 334 ... dc.publisher: The Panini Office. Bhuvaneswari Asrama. Allahabad dc.rights:
+        In Public Domain'
+      retrieved_on: '2026-11-18'
+    coverage: Anthology of several hundred Bhagavata verses from across the cantos, focused on devotion.
+    risks:
+    - Garbled Sanskrit and commentary must be filtered
+    - Citations are inconsistent, so verse IDs must be recovered by alignment
+    - Partial, thematic selection
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: unclear
+    ml_training: unclear
+    permission_status: under_review
+    usage: {}
+    notes: Anthology of Bhagavata verses with Visnu Puri's commentary (Sacred Books of the Hindus vol. VII).
+    downloads: []
+    original_source_urls: []
+  - id: eastwick-1851-prem-sagar
+    title: Prem Sagar; or, the Ocean of Love, literally translated from the Hindi of Shri Lallu Lal Kab into English
+    author_translator: Edward Backhouse Eastwick (1814-1883); Hindi by Lallu Lal (c.1803-10) after Chaturbhuj Misr's
+      Braj version
+    language: en
+    content_roles:
+    - english_translation
+    edition: 'Hertford: Stephen Austin; London: James Madden, 1851'
+    publication_years: '1851'
+    copyright_holder: none (public domain)
+    license: Public domain (1851; translator died 1883)
+    attribution_requirements: none
+    evidence:
+    - url: https://archive.org/download/dli.csl.6736/6736_djvu.txt
+      quote: 'TRANSLATED FBOM THE HINDI-OF SHBI LALLU LAI; KAB, INTO ENGLISH. BY EDWARD B. EASTWICK, M.R.A.S,, ...
+        HERTFORD: PRINTED AND PUBLISHED BY STEPHEN AUSTIN ... LONDON: JAMES MADDEN, 8, YEADENHALL STREET. MDCCCLI.'
+      retrieved_on: '2026-11-18'
+    - url: https://archive.org/download/dli.csl.6736/6736_djvu.txt
+      quote: The Reader has before him an English Translation of the Hindi Version of the Braj Bhakha Translation
+        of the Tenth Chapter of the Bhdgamt Purdnd
+      retrieved_on: '2026-11-18'
+    - url: https://archive.org/metadata/premsgarorocea00chat
+      quote: 'creator: Chaturbhuj Misr; Eastwick, Edward Backhouse, 1814-1883'
+      retrieved_on: '2026-11-18'
+    coverage: Retelling of Bhagavata Canto 10 (Krishna-lila) at third hand (Sanskrit → Braj → Hindi → English). Not
+      a translation of the Sanskrit.
+    risks:
+    - Derivative Hindi retelling; content and episodes differ from the Sanskrit Bhagavata
+    - The translator's preface contains 19th-century missionary polemic; strip it
+    - Duplicates Hollings/Pincott (same Hindi source); use only one
+    - Possibly truncated at the end; OCR diacritic errors
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: allowed
+    ml_training: allowed
+    permission_status: public_domain
+    usage: {}
+    notes: Public domain, but a translation of a Hindi retelling of Canto 10, not of the Sanskrit. Not used as Bhagavatam
+      text; could only ever be labelled as a later retelling.
+    downloads: []
+    original_source_urls: []
+  - id: bbt-prabhupada
+    title: Srimad-Bhagavatam with translations, word-for-word synonyms and purports by A.C. Bhaktivedanta Swami Prabhupada
+      (BBT; 18-volume set; online at vedabase.io)
+    author_translator: A.C. Bhaktivedanta Swami Prabhupada (died 14 Nov 1977), Cantos 1 to 10.13. Completed after
+      his death by BBT-commissioned disciples (names not verified here).
+    language: en
+    content_roles:
+    - english_translation
+    edition: BBT editions from 1972 onward (Canto 1 first appeared in Delhi in 1962-65, general knowledge, unverified).
+      Completed posthumously in the 1980s; current 18-volume set. Exact editions and years were not verified here,
+      per the hard rule.
+    publication_years: 1962-1977 (and later editions)
+    copyright_holder: The Bhaktivedanta Book Trust (California religious trust, 1972); The Bhaktivedanta Book Trust
+      International, Inc. (agent since 1988; owner of later works); The Bhaktivedanta Book Trust India (Bombay public
+      trust) for India. Pre-1978 original editions are licensed to Krishna Books Inc (KBI).
+    license: All rights reserved. No public or open licence. The BBT California trust owns works published in Prabhupada's
+      lifetime; BBTI has been its authorized agent since 1988 and owns some later works; BBT India holds the rights
+      in India. Fair-use quotation is welcome; anything beyond that needs BBTI's expre
+    attribution_requirements: 'Only under a specific grant. BBTI''s usual notice: ''Content used with permission of
+      © The Bhaktivedanta Book Trust International, Inc.'' (vedabase.io) or ''courtesy of The Bhaktivedanta Book Trust
+      International, Inc. www.krishna.com. Used with permission.'' (ISKCON temple policy).'
+    evidence:
+    - url: http://www.bbti.org/questions.html
+      quote: The Bhaktivedanta Book Trust (BBT) is a California religious trust that owns the copyrights to the works
+        published by His Divine Grace A.C. Bhaktivedanta Swami Prabhupada during his lifetime. The Bhaktivedanta Book
+        Trust International (BBTI) is a California corporation that has acted as an authorized agent of the Bhaktivedanta
+        Book Trust since 1988. The BBTI also owns the rights to some later work
+      retrieved_on: '2026-11-18'
+    - url: https://web.archive.org/web/20260101190812/https://vedabase.io/en/
+      quote: Content used with permission of © The Bhaktivedanta Book Trust International, Inc. All rights reserved.
+      retrieved_on: '2026-11-18'
+    - url: https://bbtmedia.com/terms/
+      quote: You may not engage in systematic retrieval of data or other Materials from this Site to create or compile,
+        directly or indirectly, a collection, compilation, database, or directory without express written permission
+        from BBTI.
+      retrieved_on: '2026-11-18'
+    coverage: 'Complete 12 cantos: Prabhupada through Canto 10.13; the rest completed posthumously by disciples under
+      BBT.'
+    risks:
+    - 'Active enforcement: Delhi HC 2023 blocking and takedown order against websites, apps and Instagram; 2024 decree
+      against friendwithbooks; BBTI says it has ''taken infringers to court-and prevailed against them-in countries
+      all over the world''.'
+    - Storing copies in electronic form is itself restrained reproduction in Indian orders, so a training corpus is
+      a reproduction.
+    - BBT opposes AI imitations of Prabhupada and invokes moral rights (attribution and integrity); its AI Advisory
+      Group guidelines are pending.
+    - BBT operates its own AI product (Transcend AI, January 2025), a market-harm factor against fair use.
+    - BBTI says 'For use in India, no permissions will be granted'.
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: not_allowed
+    ml_training: not_allowed
+    permission_status: excluded
+    usage: {}
+    notes: Excluded by project policy unless written permission covers ML training, model-weight distribution and
+      a public demo. Never downloaded.
+    downloads: []
+    original_source_urls: []
+  - id: bhagavata-org-anand-aadhar
+    title: 'Srimad Bhagavatam (Bhagavata Purana): ''The Story of the Fortunate One'' - concatenated English verse
+      translation (third revised edition) at bhagavata.org'
+    author_translator: Anand Aadhar Prabhu (Rene P. B. A. Meijer, born 1954, Enschede NL), assisted by Sakhya Devi
+      Dasi; the site names no 'Rene Jorna'
+    language: en
+    content_roles:
+    - english_translation
+    edition: Self-published online since 2000-2001 (srimadbhagavatam.org) and since about 2005 on bhagavata.org. 'Third
+      revised version 2012'. Chapter pages say 'Third revised edition, loaded January 4, 2016'. Introduction dated
+      January 24, 2024. Files updated November 2026.
+    publication_years: 2001-
+    copyright_holder: Anand Aadhar Prabhu (Rene P. B. A. Meijer) for his original contribution. The underlying expression
+      belongs to BBT/BBTI (Prabhupada translations and glosses) and possibly Gita Press (C.L. Goswami).
+    license: CC BY-NC-SA 3.0 Unported, as declared by the translator on the introduction, downloads and chapter pages.
+      A third-party archive.org mirror's metadata says CC BY-NC-ND 4.0, which conflicts and is not authoritative.
+      The licence can cover only the translator's own contribution; it grants nothing in BBT
+    attribution_requirements: 'If used under the CC licence: name ''Anand Aadhar'' and link to bhagavata.org (''creating
+      a link to this site and mentioning the name of Anand Aadhar''); include the CC BY-NC-SA 3.0 URI; release adaptations
+      under the same or a similar licence. Courtesy credit to Sakhya Devi Dasi (co-signs the introducti'
+    evidence:
+    - url: https://bhagavata.org/introduction.html
+      quote: For the copyright on this translation and the podcast spoken version of the book, the so-called Creative
+        Commons Attribution Noncommercial-Share Alike 3.0 Unported License has been chosen. This means that one is
+        free to copy, distribute and alter the text on the condition of attribution (refer to the name of Anand Aadhar
+        and to my website URL bhagavata.org). Furthermore the resulting work can only
+      retrieved_on: '2026-11-18'
+    - url: https://bhagavata.org/treasury/downloads.html
+      quote: All text downloads are offered as free downloads under the Creative Commons Attribution-NonCommercial-ShareAlike
+        3.0 Unported © copyright restriction that one attributes the work by creating a link to this site and mentioning
+        the name of Anand Aadhar, that adaptions, uploading and printing is allowed for non-commercial use and that
+        distributing the resultant work can only be done under the same or
+      retrieved_on: '2026-11-18'
+    - url: https://bhagavata.org/canto1/chapter1.html
+      quote: The text and audio are offered under the conditions of the Creative Commons Attribution-Noncommercial-Share
+        Alike 3.0 Unported License.
+      retrieved_on: '2026-11-18'
+    coverage: 'Complete Bhagavata Purana in English: all 12 cantos, 335 chapters, ''about 18000 verses'' (site claim;
+      verse grouping follows BBT). Includes an introduction, glossary and family trees. Older ''previous version''
+      texts appear on the chapter pages.'
+    risks:
+    - 'The translator''s own statements say the text derives from Prabhupada''s/BBT translations and glosses (''pruned,
+      retranslated''; word-for-word glosses ''followed''; 2001: ''prepared ... to the translations of Bhaktivedanta
+      Swami Prabhupada''). The CC licence cannot pass rights in BBT expression (17 USC 103('
+    - BBT is an active litigant (Delhi HC 2023 and 2024) and objects to AI uses of Prabhupada's works.
+    - 'NonCommercial: no monetized demo or commercial licensing of the weights.'
+    - 'ShareAlike: if the weights or SFT data are an ''Adaptation'', they must be released under BY-NC-SA 3.0 or 4.0,
+      which conflicts with an Apache-2.0 release.'
+    - The 'previous version' texts are likely closer to BBT wording.
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: not_allowed
+    ml_training: unclear
+    permission_status: permission_required
+    usage: {}
+    notes: bhagavata.org and srimadbhagavatam.org are the same site. CC BY-NC-SA 3.0 is declared, but the translator
+      states the text is based on Prabhupada's (BBT) translation, so the grant cannot cover the underlying expression.
+    downloads: []
+    original_source_urls: []
+  - id: vedabase-derived-datasets
+    title: Vedabase-derived 'Bhagavatam/Gita APIs', scrapers and datasets (vedicscriptures API, GitHub vedabase scrapers/APIs/MCP,
+      HF datasets, parse.bot vedabase.io API listing)
+    author_translator: Prabhupada/BBT text repackaged by third parties
+    language: en
+    content_roles:
+    - english_translation
+    edition: ''
+    publication_years: various
+    copyright_holder: BBT / BBTI (underlying text)
+    license: Repository labels (GPL-3.0, MIT, Apache-2.0, apache-2.0 tag, or none) are invalid for BBT text. The vedicscriptures
+      maintainer admits no permission was obtained.
+    attribution_requirements: none
+    evidence:
+    - url: https://github.com/orgs/vedicscriptures/discussions/5
+      quote: I haven't took any written permission from respective organisations cause these books are totally available
+        in public domain. If I will get any notice from them I will update you also.
+      retrieved_on: '2026-11-18'
+    - url: https://github.com/vedicscriptures/bhagavad-gita
+      quote: '**Featured Authors:** ... - A.C. Bhaktivedanta Swami Prabhupada'
+      retrieved_on: '2026-11-18'
+    - url: https://github.com/kodymoodley/vedabase-scraper
+      quote: A Python script to extract all verses, translations and purports from A.C. Bhaktivedanta Swami Prabhupada's
+        Bhagavad Gita as it is, Srimad Bhagavatam and Caitanya Caritamrta from the vedabase.io website
+      retrieved_on: '2026-11-18'
+    coverage: Varies; several claim the entire SB with purports.
+    risks:
+    - Unlicensed copies of BBT text; using them adds BBT infringement exposure plus the vedabase.io anti-scraping
+      posture.
+    - Licence labels are misleading.
+    - Provenance often undeclared.
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: not_allowed
+    ml_training: not_allowed
+    permission_status: excluded
+    usage: {}
+    notes: About 20 GitHub/Hugging Face repositories and APIs repackage BBT text scraped from vedabase. Their repository
+      licences (MIT, Apache-2.0, GPL-3.0) do not grant rights in BBT text.
+    downloads: []
+    original_source_urls: []
+  - id: gitapress-1971-english
+    title: Srimad Bhagavata Mahapurana (with Sanskrit text and English translation), 2 parts
+    author_translator: C. L. Goswami, M.A., Sastri (Chimmanlal Goswami); some catalogues add 'M. A. Sastri' as a second
+      translator
+    language: en
+    content_roles:
+    - english_translation
+    edition: 'Gorakhpur: Gita Press, 1971 (3rd ed. 1995)'
+    publication_years: '1971'
+    copyright_holder: Gita Press / Govind Bhawan Karyalaya, Gorakhpur (presumed)
+    license: In copyright (India 1971; restored for the US by the URAA)
+    attribution_requirements: none
+    evidence:
+    - url: https://archive.org/download/omsrimadbhagavat0000clgo/omsrimadbhagavat0000clgo_djvu.txt
+      quote: Rendered into English by ——— C. L. Goswami, M. A., Sāstri ... Published by Govind Bhawan Karyalaya Gita
+        Press, Gorakhpur First Two Editions 15,000 Copies 1971—1982 Third Edition 5,000 Copies 1995
+      retrieved_on: '2026-11-18'
+    coverage: Complete.
+    risks:
+    - In copyright; unauthorised uploads with misleading licence labels circulate
+    - bhagavata.org says its CC BY-NC-SA translation consulted the Goswami translation (relevant to the bhagavata-org-anand-aadhar
+      review)
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: not_allowed
+    ml_training: not_allowed
+    permission_status: permission_required
+    usage: {}
+    downloads: []
+    original_source_urls: []
+    notes: ''
+  - id: tagare-1976-english
+    title: The Bhagavata Purana (Ancient Indian Tradition and Mythology vols. 7-11)
+    author_translator: G. V. Tagare
+    language: en
+    content_roles:
+    - english_translation
+    edition: 'Delhi: Motilal Banarsidass, AITM vols. 7-11'
+    publication_years: 1976-1978
+    copyright_holder: Motilal Banarsidass (presumed)
+    license: In copyright (Motilal Banarsidass); wisdomlib.org hosts it without granting any licence
+    attribution_requirements: none
+    evidence:
+    - url: https://www.wisdomlib.org/hinduism/book/the-bhagavata-purana
+      quote: 'Bhagavata Purana by G. V. Tagare | 1950 | 780,972 words | ISBN-10: 8120838203 | ISBN-13: 9788120838208'
+      retrieved_on: '2026-11-18'
+    - url: https://www.wisdomlib.org/hinduism/book/the-bhagavata-purana
+      quote: 'Source: motilalbanarsidass.com ... The full text of the Bhagavata Purana in English is available here
+        and publically accesible (free to read online). Of course, I would always recommend buying the book so you
+        get the latest edition.'
+      retrieved_on: '2026-11-18'
+    coverage: Complete.
+    risks:
+    - In copyright; wisdomlib hosting is not a licence; mislabeled archive.org copies
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: not_allowed
+    ml_training: not_allowed
+    permission_status: permission_required
+    usage: {}
+    downloads: []
+    original_source_urls: []
+    notes: ''
+  - id: tapasyananda-1980-english
+    title: 'Srimad Bhagavata: The Holy Book of God (4 vols)'
+    author_translator: Swami Tapasyananda (1904-1991)
+    language: en
+    content_roles:
+    - english_translation
+    edition: 'Madras: Sri Ramakrishna Math, 1980-'
+    publication_years: 1980-
+    copyright_holder: Sri Ramakrishna Math, Chennai (presumed)
+    license: In copyright (Sri Ramakrishna Math, Chennai)
+    attribution_requirements: none
+    evidence:
+    - url: https://catalog.princeton.edu/catalog/SCSB-7692204.json
+      quote: 'Madras, India : Sri Ramakrishna Math, 1980- ... v. 1. Skandhas I-IV.--v. 2. Skandhas V-IX.--v. 3. Skandha
+        X.--v. 4. Skandhas XI-XII.'
+      retrieved_on: '2026-11-18'
+    - url: https://en.wikipedia.org/wiki/Swami_Tapasyananda
+      quote: Swami Tapasyananda (1904-1991) was a senior monk of the Ramakrishna Mission.
+      retrieved_on: '2026-11-18'
+    coverage: Complete (4 vols).
+    risks:
+    - In copyright; would be high-value if Sri Ramakrishna Math grants permission
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: not_allowed
+    ml_training: not_allowed
+    permission_status: permission_required
+    usage: {}
+    downloads: []
+    original_source_urls: []
+    notes: ''
+  - id: debroy-2018-english
+    title: The Bhagavata Purana (3 vols)
+    author_translator: Bibek Debroy (1955-2024)
+    language: en
+    content_roles:
+    - english_translation
+    edition: Penguin Random House India, 2019 (3 vols)
+    publication_years: 2018-2019
+    copyright_holder: Bibek Debroy estate / Penguin Random House India
+    license: In copyright (Penguin Random House India)
+    attribution_requirements: none
+    evidence:
+    - url: https://en.wikipedia.org/wiki/Bibek_Debroy
+      quote: Bibek Debroy (25 January 1955 – 1 November 2024) was an Indian economist ... He was also a prolific translator
+        of major Sanskrit works
+      retrieved_on: '2026-11-18'
+    - url: https://en.wikipedia.org/wiki/Bibek_Debroy
+      quote: Bhagavata Purana, 2019, 1,500 pp.; 3 vols. — Vol. 1, ISBN 978-0143428015
+      retrieved_on: '2026-11-18'
+    coverage: Complete.
+    risks:
+    - In copyright; commercial publisher
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: not_allowed
+    ml_training: not_allowed
+    permission_status: permission_required
+    usage: {}
+    downloads: []
+    original_source_urls: []
+    notes: ''
+  - id: prabhavananda-1943-english
+    title: 'Srimad Bhagavatam: The Wisdom of God'
+    author_translator: Swami Prabhavananda (1893-1976)
+    language: en
+    content_roles:
+    - english_translation
+    edition: First published 1943 (US; registration A175965, 27 Aug 1943)
+    publication_years: '1943'
+    copyright_holder: 'Swami Prabhavananda estate / Vedanta Society of Southern California (renewal claimant: Swami
+      Prabhavananda as author)'
+    license: In copyright (US registration A175965, 27 Aug 1943; renewed R491893, 8 Sep 1970)
+    attribution_requirements: none
+    evidence:
+    - url: https://archive.org/download/catalogofco1970324112libr/catalogofco1970324112libr_hocr_searchtext.txt.gz
+      quote: PRABHAVANANDA, SWAMI. Bhagavatam, srimad; the wisdom of God. © 27Aug43; A175965. Swami Prabhava- nanda
+        (A); 8Sep70; R491893.
+      retrieved_on: '2026-11-18'
+    - url: http://web.stanford.edu/dept/SUL/collections/copyrightrenewals/files/20170427-copyright-renewals-records.csv.zip
+      quote: R491893 | 1970 | Bhagavatam, srimad; the wisdom of God | PRABHAVANANDA\, SWAMI | A175965 | 8Sep70 | 27Aug43
+        | Swami Prabhavananda (A)
+      retrieved_on: '2026-11-18'
+    - url: https://en.wikipedia.org/wiki/Swami_Prabhavananda
+      quote: Swami Prabhavananda (26 December 1893 – 4 July 1976) was an Indian philosopher, monk of the Ramakrishna
+        Order
+      retrieved_on: '2026-11-18'
+    coverage: Abridged selection from all 12 cantos.
+    risks:
+    - In copyright; mislabeled copies circulate on archive.org and the Digital Library of India
+    - Abridged, so low value even with permission
+    reviewed_on: '2026-11-18'
+    review_status: researched
+    commercial_use: not_allowed
+    ml_training: not_allowed
+    permission_status: permission_required
+    usage: {}
+    downloads: []
+    original_source_urls: []
+    notes: ''
