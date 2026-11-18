@@ -1,11 +1,11 @@
 {
   "_meta": {
     "report": "data_manifest",
-    "run_id": "20261118T103020Z-ef6e7a",
-    "created_utc": "2026-11-18T10:30:20+00:00",
+    "run_id": "20261118T103551Z-443375",
+    "created_utc": "2026-11-18T10:35:52+00:00",
     "package_version": "0.1.0",
     "git": {
-      "commit": "a2e78e7f80c584363db86f2a0777907a9a0d5ebd",
+      "commit": "a9181e988424f1cebdadae50bab4a5c7be241625",
       "dirty": true
     }
   },
@@ -45,6 +45,120 @@
       "id": "gaudiya-grantha-mandira-bhagavata",
       "status": "excluded",
       "license": "All rights reserved (site footer); no open licence",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "dutt-1895-english",
+      "status": "public_domain",
+      "license": "Public domain (published Calcutta 1895-96; translator died 1912)",
+      "usage": {
+        "download": true,
+        "metadata": true
+      },
+      "review": "adversarially_verified"
+    },
+    {
+      "id": "subba-rau-1928-english",
+      "status": "under_review",
+      "license": "Public domain in the US (published November 1928). Status in India and the EU unverified: translator's death year unknown.",
+      "usage": {
+        "download": true,
+        "metadata": true
+      },
+      "review": "researched"
+    },
+    {
+      "id": "chatterjee-1895-english",
+      "status": "under_review",
+      "license": "Public domain in the US (published 1895). HathiTrust marks the Oxford and Cornell copies 'pd' (public domain everywhere); the Wellcome copy carries a Public Domain Mark. Translator's death year not verified.",
+      "usage": {
+        "download": true,
+        "metadata": true
+      },
+      "review": "researched"
+    },
+    {
+      "id": "sanyal-1929-english",
+      "status": "under_review",
+      "license": "None. Title verso: 'All rights reserved to the Publisher.' No open licence exists. Public-domain status is not established because the translator's death year is unknown.",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "sinha-1901-study",
+      "status": "under_review",
+      "license": "Public domain in the US (1901); Project Gutenberg edition under Project Gutenberg terms. Worldwide status unverified (HathiTrust 'pdus').",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "bhaktiratnavali-1912",
+      "status": "under_review",
+      "license": "Public domain (1912; anonymous translator)",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "eastwick-1851-prem-sagar",
+      "status": "public_domain",
+      "license": "Public domain (1851; translator died 1883)",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "bbt-prabhupada",
+      "status": "excluded",
+      "license": "All rights reserved. No public or open licence. The BBT California trust owns works published in Prabhupada's lifetime; BBTI has been its authorized agent since 1988 and owns some later works; BBT India holds the rights in India. Fair-use quotation is welcome; anything beyond that needs BBTI's expre",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "bhagavata-org-anand-aadhar",
+      "status": "permission_required",
+      "license": "CC BY-NC-SA 3.0 Unported, as declared by the translator on the introduction, downloads and chapter pages. A third-party archive.org mirror's metadata says CC BY-NC-ND 4.0, which conflicts and is not authoritative. The licence can cover only the translator's own contribution; it grants nothing in BBT",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "vedabase-derived-datasets",
+      "status": "excluded",
+      "license": "Repository labels (GPL-3.0, MIT, Apache-2.0, apache-2.0 tag, or none) are invalid for BBT text. The vedicscriptures maintainer admits no permission was obtained.",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "gitapress-1971-english",
+      "status": "permission_required",
+      "license": "In copyright (India 1971; restored for the US by the URAA)",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "tagare-1976-english",
+      "status": "permission_required",
+      "license": "In copyright (Motilal Banarsidass); wisdomlib.org hosts it without granting any licence",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "tapasyananda-1980-english",
+      "status": "permission_required",
+      "license": "In copyright (Sri Ramakrishna Math, Chennai)",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "debroy-2018-english",
+      "status": "permission_required",
+      "license": "In copyright (Penguin Random House India)",
+      "usage": {},
+      "review": "researched"
+    },
+    {
+      "id": "prabhavananda-1943-english",
+      "status": "permission_required",
+      "license": "In copyright (US registration A175965, 27 Aug 1943; renewed R491893, 8 Sep 1970)",
       "usage": {},
       "review": "researched"
     }

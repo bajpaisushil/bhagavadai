@@ -198,7 +198,7 @@ sources:
     - Dutt admits some passages are rendered freely; Victorian diction
     - Reprints after 1977 may carry new copyright on added material; use only the 1895-96 scans
     reviewed_on: '2026-11-18'
-    review_status: researched
+    review_status: adversarially_verified
     license_url: null
     commercial_use: allowed
     ml_training: allowed
@@ -225,10 +225,7 @@ sources:
       format: djvu-ocr-text
       sha256: 07ba02b9b9426b71d94d8a097781adf90586fa1f656214336df67701c3d3f0e1
       notes: Books VII-IX and X ch. 1-5, pages out of order
-    notes: 'Primary English candidate. Public domain worldwide (published 1895-96; translator died 1912). Not yet
-      training_text: needs the Phase 1b parser (chapter segmentation, OCR clean-up), the missing Book X ch. 6-90,
-      XI, XII (Google Books full-view scan, to be downloaded manually), and completion of adversarial verification.
-      No verse numbers: chapter-level alignment only.'
+    notes: "Primary English candidate. Adversarially verified 2026-11-18: public domain in the US, India and the EU (published 1895-96; translator died 1912 by the usual account; the conclusion rests on the publication date either way). Conditions: use only the 1895-96 scans; remove the unrelated bound-in 1880s pamphlet (Taleyarkhan, roughly lines 1265-2090 of the 40625 OCR) and re-order/de-duplicate that item; fetch Book X ch. 6-90, XI, XII from the Google Books full-view scan manually (Google's guidelines forbid automated querying); never redistribute the scan files, only cleaned derived text with provenance. Not yet training_text: needs the Phase 1b parser and the missing books. No verse numbers: chapter-level alignment."
   - id: subba-rau-1928-english
     title: Srimad Bhagavatam translated into easy English prose, embodying the interpretations of the three leading
       schools of thought (Advaita, Visistadvaita and Dvaita), Vol. I (Skandhas 1 to 7)
@@ -275,8 +272,7 @@ sources:
       format: djvu-ocr-text
       sha256: cecc92387802d33b0b0f30726949f2c7bdb86db376f5720f6bd694fff09da4ed
       notes: Vol. I, Skandhas 1-7, verse-numbered
-    notes: Verse-numbered translation of Cantos 1-7 (follows Sridhara). Public domain in the US; India/EU status depends
-      on the translator's unknown death year, so not cleared for public weights.
+    notes: "Adversarially verified as public domain in the US only (published Nov 1928; any URAA term ended 2023-12-31). India/EU status unverified: the translator's death year is unknown and he may have been active in 1937. Verse-numbered translation of Cantos 1-7 (follows Sridhara). Strip the publisher's note (different author). Not cleared for publicly released weights until the death year is established."
   - id: chatterjee-1895-english
     title: The Çrīmadbhāgavatam, translated from the original Sanskrit, with notes and original text (Book I; Book
       II held at HathiTrust)
@@ -327,7 +323,7 @@ sources:
       format: djvu-ocr-text
       sha256: 29da56aef5673e687bcbc787426f1f5b59434770a92e34f783316e3f79502098
       notes: Book I with Devanagari text, verse-numbered translation and notes
-    notes: Verse-numbered Canto 1 (Canto 2 at HathiTrust). HathiTrust marks copies 'pd'; translator's death year unverified.
+    notes: "Adversarially verified as public domain in the US only (1895 first edition); HathiTrust rights codes are inconsistent across copies, so worldwide status rests on presumption. Verse-numbered Canto 1 with Devanagari; notes quote third-party translations and must be separated from the verse text."
   - id: sanyal-1929-english
     title: 'The Srimad-Bhagbatam [Srimad-Bhagabatam] of Krishna-Dwaipayana Vyasa, translated into English prose from
       the original Sanskrit text. First edition: 26 parts bound as 5 vols, Calcutta/Dum Dum, 1929 to c.1939'
@@ -504,8 +500,7 @@ sources:
     ml_training: allowed
     permission_status: public_domain
     usage: {}
-    notes: Public domain, but a translation of a Hindi retelling of Canto 10, not of the Sanskrit. Not used as Bhagavatam
-      text; could only ever be labelled as a later retelling.
+    notes: "Public domain everywhere (adversarially verified). Not a Bhagavatam translation: an English rendering of a Hindi retelling of Canto 10. The translator's preface contains anti-Hindu polemic and must be stripped if the text is ever used; the digitized copy ends mid-chapter LXXXIX. Not used."
     downloads: []
     original_source_urls: []
   - id: bbt-prabhupada

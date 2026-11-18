@@ -6,11 +6,12 @@ retrieval. Base model: [`Qwen/Qwen3.5-0.8B-Base`](https://huggingface.co/Qwen/Qw
 pinned to revision `dc7cdfe2`. Target training machine: Apple Silicon MacBook Air M5 (16 GB) via
 PyTorch MPS.
 
-> **Status: Phase 1 (foundation).** Model loading, integrity checks, tokenizer inspection, hardware
-> and MPS compatibility checks, inference smoke test, the source/licence manifest and the initial
-> licence-gated data pipeline are implemented and tested. **Training has not started.** It is gated on
-> (a) the hardware check passing on the Mac and (b) a verified public-domain or licensed English
-> translation being added to the manifest.
+> **Status: Phase 1 (foundation) complete, plus an early web demo.** Model loading, integrity checks,
+> tokenizer inspection, hardware and MPS compatibility checks, inference smoke test, the source/licence
+> manifest, the licence-gated data pipeline, and a chat API with a web UI are implemented and tested.
+> **Training has not started.** It is gated on (a) the hardware check passing on the Mac and (b) the
+> English corpus being built from M. N. Dutt's 1895–96 translation. That translation is now verified
+> as public domain everywhere; its parser is Phase 1b.
 
 The model will identify itself as *Bhagavatam AI*. It teaches in a calm, respectful, sage-like style,
 but never claims to be Śukadeva Gosvāmī, Sūta Gosvāmī, Prabhupāda or any other person.

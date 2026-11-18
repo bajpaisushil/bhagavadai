@@ -14,8 +14,9 @@
 - **Two gates before training (Phase 2):**
   1. `bhagavatam hardware check` must report `ready_for_phase2: true` **on the M5**. All checks pass on
      the CPU codespace, but MPS behaviour can only be measured on the Mac.
-  2. A **verifiably public-domain English translation** must be cleared in the manifest. No English
-     source is cleared yet. M. N. Dutt's 1895 translation is the leading candidate (section 4).
+  2. A **verifiably public-domain English translation** must be cleared in the manifest. M. N. Dutt's
+     1895–96 translation is now adversarially verified as public domain everywhere. It becomes training
+     text when the Phase 1b parser exists and the missing volume (from Google Books) has been added.
 - **The base model hallucinates about the Bhāgavatam.** For example, it says the text was "narrated by
   Lord Caitanya to King Parikshit. This is explicitly stated in the first canto". This baseline is
   recorded (`reports/phase1/codespace-cpu/model_smoke.json`) and the fine-tuned model will be measured
@@ -47,16 +48,16 @@ No cloud GPU or paid API is used or required.
 
 ## 4. Data sources (details and evidence in DATA_LICENSING.md and `data/manifests/sources.yaml`)
 
-| Source | What | Status | Use |
+| Source | What | Status (adversarially verified 2026-11-18) | Use |
 |---|---|---|---|
-| **M. N. Dutt**, *A Prose English Translation of Srimadbhagabatam*, Calcutta 1895–96 | English, chapter-structured prose | Public domain by date: published 1895–96, translator died 1912. Verification and completeness check pending. | **Primary candidate** for training text |
-| J. M. Sanyal, *The Srimad-Bhagbatam*, Calcutta 1929–36 (26 parts) | English prose, with verse-range markers per paragraph | **Blocked:** translator unidentified (no death date in any authority file), so India/EU status is unknown. In the US only the 1929–30 parts are clearly PD. A 1954 review calls it "a very free paraphrase". | not used until the translator is identified |
-| P. N. Sinha, *A Study of the Bhāgavata Purāṇa* (1901) | English study/summary with interpretation | likely PD; to verify | possible *interpretation* source, always labelled as such |
-| GRETIL Bhāgavatapurāṇa | Sanskrit, complete (14,099 verses) | CC BY-NC-SA 4.0. Evidence that ~2/3 derives from the BBT romanised edition. | **metadata only** (verse structure, speaker labels) |
-| Sanskrit Wikisource | Sanskrit, complete | CC BY-SA 4.0; source edition undocumented | candidate Sanskrit text |
-| BBT / Prabhupāda translation and purports | English | © BBT; no ML permission | **excluded** (permission could be requested) |
-| Modern translations (Gita Press 1971, Tagare 1976, Tapasyananda, Debroy 2018) | English | in copyright | excluded |
-| sanskritdocuments.org | Sanskrit | terms prohibit AI ingestion | excluded |
+| **M. N. Dutt**, *A Prose English Translation of Srimadbhagavatam*, Calcutta 1895–96 | English prose, all 12 books, chapters + speaker tags, **no verse numbers** | **Public domain everywhere**, with conditions: drop a bound-in unrelated pamphlet from one scan; fetch Books X.6–XII from Google Books by hand | **Primary training text** (after Phase 1b) |
+| S. Subba Rau, Tirupati 1928 | English, **verse-numbered**, Cantos 1–7 | Public domain **in the US only** (translator's death year unknown) | your decision (section 9) |
+| M. N. Chatterjee, Calcutta 1895 | English, **verse-numbered**, Canto 1 (+2 at HathiTrust), Devanagari, notes | Public domain **in the US only** | your decision (section 9) |
+| J. M. Sanyal, Calcutta 1929–36 | English prose with verse-range markers | **Blocked:** translator unidentified; a "very free paraphrase" | not used |
+| GRETIL Bhāgavatapurāṇa | Sanskrit, complete (14,099 verses) | CC BY-NC-SA 4.0; ~2/3 appears to derive from the BBT romanised edition | **metadata only** (structure, speaker labels, verse equivalences) |
+| DCS; Sanskrit Wikisource | Sanskrit (partial / complete) | CC BY 4.0 annotations / CC BY-SA 4.0, editions undocumented | under review |
+| BBT / Prabhupāda; bhagavata.org (= srimadbhagavatam.org, BBT-derived); ~20 vedabase-scraped datasets | English | © BBT, or derived from it | **excluded** |
+| Gita Press, Tagare, Tapasyananda, Debroy, Prabhavananda | English | in copyright | excluded |
 
 Implication: the first trainable corpus is a single 19th-century English translation. Two
 consequences follow.
@@ -162,10 +163,27 @@ on the codespace (measured).
 
 ## 9. Decisions needed from you
 
-1. Accept **M. N. Dutt (1895)** as the primary English source once verified, knowing its style is
-   19th-century and the SFT layer supplies modern English?
-2. Should we **ask the BBT for permission**? It is a long shot, and any permission would need to cover
-   training, weights and a public demo.
-3. SFT drafting: **local model only** (free, slower, more review effort) or **optional external LLM**
-   drafting with mandatory validation and human review?
-4. A **licence for the code** (e.g. Apache-2.0 or MIT).
+1. Accept **M. N. Dutt (1895–96)** as the primary English source? It is verified public domain, but its
+   19th-century prose means the modern voice must come from the SFT layer.
+2. **Download one PDF by hand:** Dutt Books VIII–XII from Google Books (`RQQ-AQAAMAAJ`, full view). Google's
+   guidelines forbid scripted downloads, and only that scan contains Book X ch. 6–90, XI and XII.
+3. Use **verse-numbered US-only public-domain** sources (Subba Rau 1928, Chatterjee 1895) to enable
+   verse-level citations? The trade-off: the published weights would rest on US status for that text.
+   Without them, citations stay at chapter level ("SB 10.29").
+4. Should we **ask the BBT for permission**? Any permission would need to cover training, weights and a
+   public demo.
+5. SFT drafting: **local model only** (free) or **optional external LLM** drafting, with mandatory
+   validation and human review?
+6. A **licence for the code** (e.g. Apache-2.0 or MIT).
+
+## 10. Status beyond Phase 1
+
+- **Web demo:** a FastAPI backend with streaming plus a Next.js chat UI. It currently serves the base
+  model, labelled as untrained (`make demo`).
+- **Independent code review:** 4 reviewers, then adversarial verifiers. 25 findings were reported:
+  - 19 were confirmed;
+  - 5 were real but already fixed by the time the verifiers looked;
+  - 1 was refuted (and documented anyway).
+
+  All real findings are fixed with regression tests. They include a licence-gate redirect bypass, NaN
+  training steps reported as success, and a bf16 fused-loss error of 15 %.
