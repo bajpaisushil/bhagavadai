@@ -20,6 +20,7 @@ import logging
 import math
 import statistics
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -111,28 +112,56 @@ def _numerics(
     return result
 
 
-def _generation(model: Any, tokenizer: Any, device: torch.device, max_new_tokens: int) -> dict[str, Any]:
+def _generation(
+    model: Any, tokenizer: Any, device: torch.device, max_new_tokens: int, *, min_cache_agreement: float = 0.9
+) -> dict[str, Any]:
+    """Greedy generation speed, plus two correctness checks of the cached decode path.
+
+    1. every raw logit produced during decoding must be finite;
+    2. cache consistency: a single no-cache forward pass over prompt + generated tokens (teacher forcing)
+       must predict the same tokens the cached decode produced (recurrent DeltaNet state, conv state and
+       KV cache all have to be right for that to hold).
+    """
     inputs = tokenizer(GENERATION_PROMPT, return_tensors="pt").to(device)
+    prompt_len = int(inputs.input_ids.shape[1])
     common = {"do_sample": False, "pad_token_id": tokenizer.pad_token_id}
     with torch.inference_mode():
         model.generate(**inputs, max_new_tokens=2, **common)  # warm-up (kernel compilation, caches)
         synchronize(device)
         start = time.perf_counter()
         output = model.generate(
-            **inputs, max_new_tokens=max_new_tokens, min_new_tokens=max_new_tokens, **common
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            min_new_tokens=max_new_tokens,
+            output_logits=True,
+            return_dict_in_generate=True,
+            **common,
         )
         synchronize(device)
-    seconds = time.perf_counter() - start
-    new_tokens = output[0, inputs.input_ids.shape[1] :].tolist()
+        seconds = time.perf_counter() - start
+        sequence = output.sequences[0]
+        new_tokens = sequence[prompt_len:]
+        logits_finite = all(bool(torch.isfinite(step).all()) for step in output.logits)
+        full = model(input_ids=sequence[None, :-1], use_cache=False).logits[0, prompt_len - 1 :].float()
+        if tokenizer.eos_token_id is not None:  # EOS was suppressed during decoding by min_new_tokens
+            full[:, tokenizer.eos_token_id] = -math.inf
+        agreement = float((full.argmax(-1) == new_tokens).float().mean())
+    count = int(new_tokens.numel())
     return {
         "prompt": GENERATION_PROMPT,
-        "new_tokens": len(new_tokens),
+        "new_tokens": count,
         "seconds": round(seconds, 3),
-        "tokens_per_s": round(len(new_tokens) / seconds, 2) if seconds > 0 else None,
-        "distinct_token_ratio": round(len(set(new_tokens)) / max(1, len(new_tokens)), 3),
+        "tokens_per_s": round(count / seconds, 2) if seconds > 0 else None,
+        "distinct_token_ratio": round(len(set(new_tokens.tolist())) / max(1, count), 3),
+        "logits_finite": logits_finite,
+        "cache_consistency": round(agreement, 4),
         "text": tokenizer.decode(new_tokens, skip_special_tokens=True),
-        "ok": len(new_tokens) == max_new_tokens,
+        "ok": count == max_new_tokens and logits_finite and agreement >= min_cache_agreement,
     }
+
+
+class NonFiniteError(RuntimeError):
+    """A training step produced a NaN/inf loss or gradient norm."""
 
 
 @dataclass
@@ -150,14 +179,24 @@ class _Trainer:
         self.params = trainable_parameters(self.model)
         self.optimizer = make_optimizer(self.params, self.learning_rate, self.device)
 
-    def step(self, ids: torch.Tensor, mode: str | None = None) -> float:
+    def step(
+        self, ids: torch.Tensor, mode: str | None = None, on_backward: Callable[[], None] | None = None
+    ) -> float:
+        """One optimizer step. Raises :class:`NonFiniteError` (without updating the adapters) when the
+        loss or gradient norm is NaN/inf, so a numerical failure can never be reported as success."""
         tcfg = self.cfg.training
         loss = causal_lm_loss(self.model, ids, mode=mode or tcfg.loss, chunk_size=tcfg.loss_chunk_size)
         torch.autograd.backward(loss)
-        torch.nn.utils.clip_grad_norm_(self.params, 1.0)
+        if on_backward is not None:
+            on_backward()  # gradients are alive here: the closest observable point to peak memory
+        grad_norm = float(torch.nn.utils.clip_grad_norm_(self.params, 1.0))
+        loss_value = float(loss.detach())
+        if not (math.isfinite(loss_value) and math.isfinite(grad_norm)):
+            self.optimizer.zero_grad(set_to_none=True)
+            raise NonFiniteError(f"non-finite loss ({loss_value}) or gradient norm ({grad_norm})")
         self.optimizer.step()
         self.optimizer.zero_grad(set_to_none=True)
-        return float(loss.detach())
+        return loss_value
 
     def measure(self, ids: torch.Tensor, *, mode: str) -> dict[str, Any]:
         """Time warm-up + measured steps on one batch; returns status, speed and memory."""
@@ -173,7 +212,7 @@ class _Trainer:
                 losses: list[float] = []
                 for step in range(tcfg.warmup_steps + tcfg.measured_steps):
                     start = time.perf_counter()
-                    loss = self.step(ids, mode)
+                    loss = self.step(ids, mode, on_backward=monitor.sample_device)
                     synchronize(self.device)
                     monitor.sample_device()
                     if step >= tcfg.warmup_steps:
@@ -192,6 +231,8 @@ class _Trainer:
                 memory=memory,
                 memory_pressure=_under_pressure(memory, self.cfg),
             )
+        except NonFiniteError as exc:
+            entry.update(status="nonfinite", detail=str(exc))
         except Exception as exc:
             status = "oom" if is_out_of_memory(exc) else "error"
             entry.update(status=status, detail=f"{type(exc).__name__}: {exc}"[:600])
@@ -207,8 +248,13 @@ class _Trainer:
         per_minute: list[float] = []
         window_start, window_tokens = time.perf_counter(), 0
         thermal_start = thermal_state()
+        failure: str | None = None
         while time.perf_counter() < deadline:
-            self.step(ids)
+            try:
+                self.step(ids)
+            except NonFiniteError as exc:
+                failure = str(exc)
+                break
             synchronize(self.device)
             window_tokens += ids.numel()
             if time.perf_counter() - window_start >= 60:
@@ -220,6 +266,7 @@ class _Trainer:
             "minutes": self.cfg.training.sustained_minutes,
             "tokens_per_s_per_minute": per_minute,
             "throttling_drop_pct": round(100 * (1 - last / first), 1) if first and last else None,
+            "nonfinite": failure,
             "thermal_start": thermal_start,
             "thermal_end": thermal_state(),
         }
@@ -242,7 +289,10 @@ def _overfit_sanity(
         return {"skipped": True, "ok": True}
     trainer = _Trainer(model, device, cfg, learning_rate=1e-3)
     ids = _token_block(tokenizer, 128).to(device)
-    losses = [trainer.step(ids) for _ in range(steps)]
+    try:
+        losses = [trainer.step(ids) for _ in range(steps)]
+    except NonFiniteError as exc:
+        return {"ok": False, "finite": False, "decreased": False, "detail": str(exc)}
     synchronize(device)
     finite = all(math.isfinite(x) for x in losses)
     decreased = finite and losses[-1] < losses[0] - 0.05
@@ -305,40 +355,63 @@ def theoretical_memory(
     }
 
 
+def _ok(report: dict[str, Any], key: str) -> bool:
+    section = report.get(key)
+    return isinstance(section, dict) and bool(section.get("ok"))
+
+
 def _verdict(report: dict[str, Any], cfg: HardwareCheckConfig) -> dict[str, Any]:
-    ops = report.get("op_checks", [])
     dtype = report["dtype"]
-    relevant = [o for o in ops if o["dtype"] in {dtype, "float32"}]
-    ops_ok = all(o["status"] == "pass" for o in relevant)
-    train = report.get("training", {}).get("sweep", [])
-    ok_runs = [t for t in train if t.get("status") == "ok" and not t.get("memory_pressure")]
+    ops = report.get("op_checks")
+    if isinstance(ops, list):
+        relevant = [o for o in ops if o["dtype"] in {dtype, "float32"}]
+        ops_ok = bool(relevant) and all(o["status"] == "pass" for o in relevant)
+        failed_ops = sorted(
+            {f"{o['name']}[{o['dtype']}]:{o['status']}" for o in relevant if o["status"] != "pass"}
+        )
+    else:  # stage failed, or disabled
+        ops_ok, failed_ops = False, ["op_checks stage did not complete"]
+    raw_training = report.get("training")
+    training: dict[str, Any] = raw_training if isinstance(raw_training, dict) else {}
+    sweep: list[dict[str, Any]] = training.get("sweep", [])
+    comparisons: list[dict[str, Any]] = training.get("loss_mode_comparison", [])
+    nonfinite = [e for e in [*sweep, *comparisons] if e.get("status") == "nonfinite"]
+    if isinstance(training.get("sustained"), dict) and training["sustained"].get("nonfinite"):
+        nonfinite.append(training["sustained"])
+    ok_runs = [t for t in sweep if t.get("status") == "ok" and not t.get("memory_pressure")]
     best = max(ok_runs, key=lambda t: t["seq_len"]) if ok_runs else None
-    sanity_ok = bool(report.get("training_sanity", {}).get("ok"))
     verdict: dict[str, Any] = {
         "device": report["device"],
         "dtype": dtype,
         "op_checks_ok": ops_ok,
-        "failed_ops": sorted(
-            {f"{o['name']}[{o['dtype']}]:{o['status']}" for o in relevant if o["status"] != "pass"}
+        "failed_ops": failed_ops,
+        "model_load_ok": _ok(report, "load"),
+        "numerics_ok": _ok(report, "numerics"),
+        "generation_ok": _ok(report, "generation"),
+        # Any NaN/inf during training is a numerical failure, even if another length trained fine.
+        "lora_training_ok": _ok(report, "training_sanity") and best is not None and not nonfinite,
+        "nonfinite_runs": [f"{e.get('seq_len')}:{e.get('loss_mode', '')}" for e in nonfinite],
+        "failed_stages": sorted(
+            k
+            for k, v in report.items()
+            if isinstance(v, dict) and v.get("status") in {"oom", "error", "skipped"}
         ),
-        "model_load_ok": report.get("load", {}).get("ok", False),
-        "numerics_ok": report.get("numerics", {}).get("ok", False),
-        "generation_ok": report.get("generation", {}).get("ok", False),
-        "lora_training_ok": sanity_ok and best is not None,
         "max_seq_len_without_memory_pressure": best["seq_len"] if best else None,
         "tokens_per_s_at_max_seq_len": best["tokens_per_s"] if best else None,
         "hours_per_million_tokens_at_max_seq_len": best["hours_per_million_tokens"] if best else None,
     }
-    comparisons = [
-        c for c in report.get("training", {}).get("loss_mode_comparison", []) if c.get("status") == "ok"
+    candidates = ([best] if best else []) + [
+        c for c in comparisons if c.get("status") == "ok" and not c.get("memory_pressure")
     ]
-    candidates = ([best] if best else []) + [c for c in comparisons if not c.get("memory_pressure")]
     if candidates:
         fastest = max(candidates, key=lambda c: c["tokens_per_s"])
         verdict["fastest_loss_mode"] = fastest["loss_mode"]
         verdict["fastest_tokens_per_s"] = fastest["tokens_per_s"]
     keys = ("op_checks_ok", "model_load_ok", "numerics_ok", "generation_ok", "lora_training_ok")
-    verdict["ready_for_phase2"] = all(verdict[k] for k in keys) and report["device"] != "cpu"
+    # checks_ok: every functional check passed on this device (meaningful on CPU too, e.g. in CI).
+    verdict["checks_ok"] = all(verdict[k] for k in keys)
+    # ready_for_phase2: the checks passed on the accelerator that will actually train.
+    verdict["ready_for_phase2"] = verdict["checks_ok"] and report["device"] != "cpu"
     if report["device"] == "cpu":
         verdict["note"] = (
             "Ran on CPU: this validates the pipeline only. Run on the Apple Silicon Mac for the real verdict."
@@ -346,9 +419,70 @@ def _verdict(report: dict[str, Any], cfg: HardwareCheckConfig) -> dict[str, Any]
     return verdict
 
 
+def _stage(report: dict[str, Any], name: str, fn: Callable[[], Any]) -> Any:
+    """Run one stage; record a failure in the report instead of losing everything collected so far."""
+    try:
+        return fn()
+    except Exception as exc:
+        status = "oom" if is_out_of_memory(exc) else "error"
+        report[name] = {"ok": False, "status": status, "detail": f"{type(exc).__name__}: {exc}"[:600]}
+        logger.error("hardware check stage '%s' failed: %s", name, report[name]["detail"])
+        return None
+
+
+def _skip(report: dict[str, Any], names: tuple[str, ...], reason: str) -> None:
+    for name in names:
+        report.setdefault(name, {"ok": False, "status": "skipped", "detail": reason})
+
+
+def _training_stages(
+    report: dict[str, Any],
+    *,
+    model: Any,
+    tokenizer: Any,
+    device: torch.device,
+    dtype: torch.dtype,
+    model_cfg: ModelConfig,
+    cfg: HardwareCheckConfig,
+    load_report: Any,
+) -> None:
+    peft_model = _stage(
+        report,
+        "lora",
+        lambda: build_lora_model(
+            model,
+            cfg.training.lora,
+            model_cfg.lora_target_modules,
+            gradient_checkpointing=cfg.training.gradient_checkpointing,
+        ),
+    )
+    if peft_model is None:
+        _skip(report, ("training_sanity", "training"), "LoRA adapters could not be attached")
+        return
+    lora_params = sum(p.numel() for p in trainable_parameters(peft_model))
+    report["lora"] = {
+        "trainable_parameters": lora_params,
+        "target_modules": list(model_cfg.lora_target_modules),
+    }
+    sanity = _stage(report, "training_sanity", lambda: _overfit_sanity(peft_model, tokenizer, device, cfg))
+    if sanity is not None:
+        report["training_sanity"] = sanity
+    training = _stage(report, "training", lambda: _training_benchmark(peft_model, tokenizer, device, cfg))
+    if training is not None:
+        report["training"] = training
+    report["thermal_after"] = thermal_state()
+    report["theoretical_memory"] = theoretical_memory(
+        load_report.num_parameters,
+        load_report.num_embedding_parameters,
+        lora_params,
+        torch.finfo(dtype).bits // 8,
+    )
+
+
 def run_hardware_check(
     model_cfg: ModelConfig, cfg: HardwareCheckConfig, *, skip_training: bool = False
 ) -> dict[str, Any]:
+    """Run every stage and always return a report; failed stages are recorded, never raised."""
     seed_everything(cfg.seed)
     device = select_device(cfg.device)
     dtype = dtype_for_device(device, model_cfg.dtype)
@@ -359,54 +493,76 @@ def run_hardware_check(
         "device": device.type,
         "dtype": str(dtype).removeprefix("torch."),
         "config": cfg.model_dump(mode="json"),
+        "thermal_note": "pmset thermal fields are informational only on Apple Silicon; use "
+        "training.sustained.throttling_drop_pct (sustained run) as the throttling measure.",
         "thermal_before": thermal_state(),
     }
     logger.info("Hardware check on %s (%s)", device, report["dtype"])
+    later = ("load", "numerics", "generation", "training_sanity", "training")
 
     if cfg.op_checks.enabled:
         dtypes = [dtype_from_name(name) for name in cfg.op_checks.dtypes]
-        report["op_checks"] = [vars(r) for r in run_op_checks(device, dtypes, seed=cfg.seed)]
-        report["op_check_descriptions"] = descriptions()
+        ops = _stage(
+            report, "op_checks", lambda: [vars(r) for r in run_op_checks(device, dtypes, seed=cfg.seed)]
+        )
+        if ops is not None:
+            report["op_checks"] = ops
+            report["op_check_descriptions"] = descriptions()
 
-    tokenizer = load_tokenizer(model_cfg, snapshot=snapshot_dir(model_cfg))
+    tokenizer = _stage(
+        report, "tokenizer", lambda: load_tokenizer(model_cfg, snapshot=snapshot_dir(model_cfg))
+    )
+    if tokenizer is None:
+        _skip(report, later, "tokenizer could not be loaded")
+        report["verdict"] = _verdict(report, cfg)
+        return report
     ids = _token_block(tokenizer, 96)
     reference = None
     if device.type != "cpu" and cfg.numerics.compare_with_cpu_reference:
         logger.info("Computing float32 CPU reference predictions")
-        reference = _cpu_reference(model_cfg, ids)
+        reference = _stage(report, "cpu_reference", lambda: _cpu_reference(model_cfg, ids))
 
-    with MemoryMonitor(device) as monitor:
-        model, load_report = load_model(model_cfg, device, dtype)
-        synchronize(device)
-        monitor.sample_device()
-    report["load"] = {"ok": True, **load_report.to_dict(), "memory": monitor.summary()}
-    report["numerics"] = _numerics(model, ids, device, reference, cfg)
+    def load() -> Any:
+        with MemoryMonitor(device) as monitor:
+            model, load_report = load_model(model_cfg, device, dtype)
+            synchronize(device)
+            monitor.sample_device()
+        report["load"] = {"ok": True, **load_report.to_dict(), "memory": monitor.summary()}
+        return model, load_report
 
-    with MemoryMonitor(device) as monitor:
-        report["generation"] = _generation(model, tokenizer, device, cfg.generation.max_new_tokens)
-        monitor.sample_device()
-    report["generation"]["memory"] = monitor.summary()
+    loaded = _stage(report, "load", load)
+    if loaded is None:
+        _skip(report, later[1:], "model did not load")
+        report["verdict"] = _verdict(report, cfg)
+        return report
+    model, load_report = loaded
 
-    if cfg.training.enabled and not skip_training:
-        peft_model = build_lora_model(
-            model,
-            cfg.training.lora,
-            model_cfg.lora_target_modules,
-            gradient_checkpointing=cfg.training.gradient_checkpointing,
-        )
-        lora_params = sum(p.numel() for p in trainable_parameters(peft_model))
-        report["lora"] = {
-            "trainable_parameters": lora_params,
-            "target_modules": list(model_cfg.lora_target_modules),
-        }
-        report["training_sanity"] = _overfit_sanity(peft_model, tokenizer, device, cfg)
-        report["training"] = _training_benchmark(peft_model, tokenizer, device, cfg)
-        report["thermal_after"] = thermal_state()
-        report["theoretical_memory"] = theoretical_memory(
-            load_report.num_parameters,
-            load_report.num_embedding_parameters,
-            lora_params,
-            torch.finfo(dtype).bits // 8,
+    numerics = _stage(report, "numerics", lambda: _numerics(model, ids, device, reference, cfg))
+    if numerics is not None:
+        report["numerics"] = numerics
+
+    def generation() -> dict[str, Any]:
+        with MemoryMonitor(device) as monitor:
+            result = _generation(model, tokenizer, device, cfg.generation.max_new_tokens)
+            monitor.sample_device()
+        return {**result, "memory": monitor.summary()}
+
+    generated = _stage(report, "generation", generation)
+    if generated is not None:
+        report["generation"] = generated
+
+    if not cfg.training.enabled or skip_training:
+        _skip(report, ("training_sanity", "training"), "training checks disabled")
+    else:
+        _training_stages(
+            report,
+            model=model,
+            tokenizer=tokenizer,
+            device=device,
+            dtype=dtype,
+            model_cfg=model_cfg,
+            cfg=cfg,
+            load_report=load_report,
         )
     report["verdict"] = _verdict(report, cfg)
     return report

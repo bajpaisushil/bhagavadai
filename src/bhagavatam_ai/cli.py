@@ -81,10 +81,10 @@ def cmd_model_download(rt: Runtime) -> int:
     cfg = load_model_config(rt.paths.configs / "model.yaml")
     result = download_and_verify(cfg)
     rt.report("model_download", result)
-    print(
-        f"{cfg.name_or_path}@{cfg.revision[:10]}: {len(result['files'])} files, "
-        f"{result['total_size_gb']} GB, all checksums verified"
-    )
+    files, size = len(result["files"]), result["total_size_gb"]
+    sha, blob = result["verified_sha256"], result["verified_git_blob"]
+    print(f"{cfg.name_or_path}@{cfg.revision[:10]}: {files} files, {size} GB")
+    print(f"verified: {sha} by SHA-256 (LFS), {blob} by git blob id")
     return EXIT_OK
 
 
@@ -204,8 +204,10 @@ def cmd_hardware_check(rt: Runtime) -> int:
         cfg = cfg.model_copy(update=overrides)
     report = run_hardware_check(model_cfg, cfg, skip_training=rt.args.skip_training)
     rt.report("hardware_check", report)
-    _print(report["verdict"])
-    sweep = report.get("training", {}).get("sweep", [])
+    verdict = report["verdict"]
+    _print(verdict)
+    training = report.get("training")
+    sweep = training.get("sweep", []) if isinstance(training, dict) else []
     for row in sweep:
         mem = row.get("memory", {})
         print(
@@ -213,7 +215,9 @@ def cmd_hardware_check(rt: Runtime) -> int:
             f"peak_driver_gb={mem.get('peak_device_driver_gb')} peak_rss_gb={mem.get('peak_process_rss_gb')} "
             f"pressure={row.get('memory_pressure')}"
         )
-    if rt.args.strict and not report["verdict"]["ready_for_phase2"]:
+    if not verdict["checks_ok"]:
+        return EXIT_CHECKS_FAILED
+    if rt.args.strict and not verdict["ready_for_phase2"]:
         return EXIT_CHECKS_FAILED
     return EXIT_OK
 
@@ -294,11 +298,13 @@ def cmd_data_validate(rt: Runtime) -> int:
     from bhagavatam_ai.data.validate import Severity
 
     ctx = _data_context(rt)
-    sources = [
-        s
-        for s in _selected_sources(ctx, rt.args.source, lambda s: bool(s.parser))
-        if ctx.interim_file(s.id).exists()
-    ]
+    if rt.args.source:  # explicit ids: a missing parse is an error, not something to skip
+        sources = _selected_sources(ctx, rt.args.source, lambda s: True)
+    else:
+        sources = [s for s in ctx.manifest.sources if s.parser and ctx.interim_file(s.id).exists()]
+        if not sources:
+            logger.error("nothing to validate: no source has been parsed yet (run `bhagavatam data parse`)")
+            return EXIT_ERROR
     reports = [validate_source(ctx, s.id, use_reference=not rt.args.no_reference) for s in sources]
     rt.report("data_validation", {"sources": [r.to_dict() for r in reports]})
     for r in reports:
@@ -312,7 +318,9 @@ def cmd_data_reference(rt: Runtime) -> int:
 
     ctx = _data_context(rt)
     path = write_reference_structure(ctx, rt.args.source)
-    print(f"wrote {path.relative_to(rt.paths.root)}")
+    shown = path.relative_to(rt.paths.root) if path.is_relative_to(rt.paths.root) else path
+    rt.report("data_reference", {"source_id": rt.args.source, "path": str(shown)})
+    print(f"wrote {shown}")
     return EXIT_OK
 
 
@@ -384,7 +392,11 @@ def build_parser() -> argparse.ArgumentParser:
     check.add_argument("--device", choices=["auto", "mps", "cuda", "cpu"])
     check.add_argument("--skip-training", action="store_true")
     check.add_argument("--sustained-minutes", type=float, help="add a sustained run to measure throttling")
-    check.add_argument("--strict", action="store_true", help="exit 2 unless ready_for_phase2")
+    check.add_argument(
+        "--strict",
+        action="store_true",
+        help="also exit 2 unless ready_for_phase2 (needs an accelerator); failed checks always exit 2",
+    )
     check.set_defaults(func=cmd_hardware_check)
 
     data = groups.add_parser("data", help="licence-gated dataset pipeline").add_subparsers(
@@ -418,7 +430,11 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    configure_logging(args.log_level, json_console=args.log_json, log_file=args.log_file)
+    try:
+        configure_logging(args.log_level, json_console=args.log_json, log_file=args.log_file)
+    except OSError as exc:
+        print(f"error: cannot open log file {args.log_file}: {exc.strerror or exc}", file=sys.stderr)
+        return EXIT_ERROR
     try:
         runtime = Runtime(args)
         code: int = args.func(runtime)

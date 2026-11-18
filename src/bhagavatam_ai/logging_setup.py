@@ -17,6 +17,7 @@ _NOISY_LOGGERS: Final = (
     "filelock",
     "huggingface_hub.file_download",
 )
+_OWNED: Final = "_bhagavatam_owned"
 _RESERVED: Final = frozenset(logging.LogRecord("", 0, "", 0, "", None, None).__dict__) | {
     "message",
     "asctime",
@@ -44,11 +45,14 @@ class JsonFormatter(logging.Formatter):
 def configure_logging(
     level: str = "INFO", *, json_console: bool = False, log_file: Path | None = None
 ) -> None:
-    """Configure the root logger. Safe to call more than once (handlers are replaced)."""
+    """Configure the root logger. Safe to call more than once: handlers installed by an earlier call are
+    replaced; handlers installed by someone else (a host application, pytest) are left alone."""
     root = logging.getLogger()
     root.setLevel(level.upper())
     for handler in list(root.handlers):
-        root.removeHandler(handler)
+        if getattr(handler, _OWNED, False):
+            root.removeHandler(handler)
+            handler.close()
 
     console = logging.StreamHandler(sys.stderr)
     console.setFormatter(
@@ -56,12 +60,14 @@ def configure_logging(
         if json_console
         else logging.Formatter("%(asctime)s %(levelname)-7s %(name)s: %(message)s", datefmt="%H:%M:%S")
     )
+    setattr(console, _OWNED, True)
     root.addHandler(console)
 
     if log_file is not None:
         log_file.parent.mkdir(parents=True, exist_ok=True)
         file_handler = logging.FileHandler(log_file, encoding="utf-8")
         file_handler.setFormatter(JsonFormatter())
+        setattr(file_handler, _OWNED, True)
         root.addHandler(file_handler)
 
     for name in _NOISY_LOGGERS:

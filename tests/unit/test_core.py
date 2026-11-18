@@ -57,6 +57,28 @@ def test_config_errors(tmp_path: Path, yaml_text: str, message: str) -> None:
         load_section(path, "model", ModelConfig)
 
 
+@pytest.mark.parametrize(
+    ("training", "message"),
+    [({"seq_lens": []}, "at least 1"), ({"seq_lens": [1]}, "greater than or equal to 2")],
+)
+def test_hardware_config_rejects_bad_seq_lens(training: dict[str, object], message: str) -> None:
+    from pydantic import ValidationError
+
+    from bhagavatam_ai.config import HardwareCheckConfig
+
+    with pytest.raises(ValidationError, match=message):
+        HardwareCheckConfig.model_validate({"training": training})
+
+
+def test_dedup_config_requires_divisible_bands() -> None:
+    from pydantic import ValidationError
+
+    from bhagavatam_ai.config import DedupConfig
+
+    with pytest.raises(ValidationError, match="divisible"):
+        DedupConfig(num_perm=64, bands=12)
+
+
 def test_missing_config(tmp_path: Path) -> None:
     with pytest.raises(ConfigError, match="not found"):
         load_model_config(tmp_path / "nope.yaml")

@@ -8,10 +8,10 @@ falling back to a default.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal, TypeVar
+from typing import Annotated, Any, Literal, Self, TypeVar
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
 DTypeName = Literal["float32", "bfloat16", "float16"]
 DevicePreference = Literal["auto", "mps", "cuda", "cpu"]
@@ -88,7 +88,7 @@ class LoraSettings(StrictModel):
 
 class TrainingCheckConfig(StrictModel):
     enabled: bool = True
-    seq_lens: tuple[int, ...] = (256, 512, 1024, 2048)
+    seq_lens: tuple[Annotated[int, Field(ge=2)], ...] = Field(default=(256, 512, 1024, 2048), min_length=1)
     batch_size: int = Field(default=1, gt=0)
     warmup_steps: int = Field(default=1, ge=0)
     measured_steps: int = Field(default=3, gt=0)
@@ -146,6 +146,12 @@ class DedupConfig(StrictModel):
     num_perm: int = Field(default=64, gt=0)
     bands: int = Field(default=16, gt=0)
     near_duplicate_threshold: float = Field(default=0.85, gt=0, le=1)
+
+    @model_validator(mode="after")
+    def _bands_divide_perms(self) -> Self:
+        if self.num_perm % self.bands:
+            raise ValueError(f"num_perm ({self.num_perm}) must be divisible by bands ({self.bands})")
+        return self
 
 
 class ValidationConfig(StrictModel):

@@ -103,6 +103,7 @@ real architecture.
 | Base weights, bf16 | ~1.5 GB |
 | LoRA r=16 (fp32 weights + grads + AdamW) | ~0.16 GB |
 | fp32 logits + gradient at 2,048 tokens if materialised | ~3.8 GB, **avoided** by chunked/fused CE |
+| *Caveat (measured):* torch's fused `linear_cross_entropy` with bf16 inputs averages in bf16. It was 1.5 nats (15 %) off at ~2k rows, and `acc_dtype=float32` did not help. The fused mode therefore takes per-row losses and reduces them in fp32 (error < 1e-3). | |
 | DeltaNet fallback activations without checkpointing | ~100–200 MiB per layer per 1–2K tokens [researched]; activation checkpointing is on |
 | Full fine-tune, all params, fp32 AdamW | 11.2 GB static, infeasible |
 | Full fine-tune, frozen embeddings | 8.4 GB static, borderline at best |

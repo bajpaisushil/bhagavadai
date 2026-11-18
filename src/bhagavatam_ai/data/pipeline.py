@@ -70,6 +70,10 @@ class PipelineContext:
     def interim_file(self, source_id: str) -> Path:
         return self.paths.interim / source_id / "verses.jsonl"
 
+    def show(self, path: Path) -> str:
+        """Project-relative path for messages (absolute paths can reveal the user name)."""
+        return str(path.relative_to(self.paths.root)) if path.is_relative_to(self.paths.root) else path.name
+
 
 def _script_for(entry: SourceEntry) -> Script:
     if ContentRole.SANSKRIT_TEXT in entry.content_roles:
@@ -138,7 +142,9 @@ def parse_source(ctx: PipelineContext, source_id: str) -> dict[str, Any]:
     spec = entry.downloads[0]
     raw = ctx.paths.raw / entry.id / spec.filename
     if not raw.exists():
-        raise PipelineError(f"{raw} not found; run `bhagavatam data download --source {source_id}` first")
+        raise PipelineError(
+            f"{ctx.show(raw)} not found; run `bhagavatam data download --source {source_id}` first"
+        )
     raw_sha = sha256_file(raw)
     if spec.sha256 and raw_sha != spec.sha256:
         raise PipelineError(f"{raw.name}: sha256 {raw_sha} differs from the manifest's pinned {spec.sha256}")
@@ -169,7 +175,7 @@ def parse_source(ctx: PipelineContext, source_id: str) -> dict[str, Any]:
 def load_records(ctx: PipelineContext, source_id: str) -> list[VerseRecord]:
     path = ctx.interim_file(source_id)
     if not path.exists():
-        raise PipelineError(f"{path} not found; run the parse stage for {source_id} first")
+        raise PipelineError(f"{ctx.show(path)} not found; run the parse stage for {source_id} first")
     return [VerseRecord.model_validate(row) for row in iter_jsonl(path)]
 
 

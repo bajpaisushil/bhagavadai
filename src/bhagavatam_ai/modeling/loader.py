@@ -63,6 +63,14 @@ def fast_path_kernels() -> dict[str, bool]:
     return {name: importlib.util.find_spec(name) is not None for name in ("fla", "causal_conv1d")}
 
 
+def git_blob_sha1(path: Path) -> str:
+    """Git's object id for a file: sha1(b"blob <size>\\0" + content)."""
+    import hashlib
+
+    data = path.read_bytes()
+    return hashlib.sha1(b"blob %d\x00" % len(data) + data, usedforsecurity=False).hexdigest()
+
+
 def snapshot_dir(cfg: ModelConfig, *, local_files_only: bool = False) -> Path:
     """Return the local snapshot directory for the pinned revision, downloading it if needed."""
     from huggingface_hub import snapshot_download
@@ -85,8 +93,17 @@ def download_and_verify(cfg: ModelConfig) -> dict[str, Any]:
         if expected_sha and local.exists():
             entry["sha256_expected"] = expected_sha
             entry["sha256_ok"] = sha256_file(local) == expected_sha
+        elif sibling.blob_id and local.exists():  # small files live in git: compare the git blob id
+            entry["git_blob_ok"] = git_blob_sha1(local) == sibling.blob_id
         files.append(entry)
-    failed = [f["file"] for f in files if not f["present"] or f.get("sha256_ok") is False]
+    failed = [
+        f["file"]
+        for f in files
+        if not f["present"] or f.get("sha256_ok") is False or f.get("git_blob_ok") is False
+    ]
+    unverified = [f["file"] for f in files if "sha256_ok" not in f and "git_blob_ok" not in f]
+    if unverified:
+        raise ModelIntegrityError(f"No checksum available to verify: {unverified}")
     if failed:
         raise ModelIntegrityError(f"Snapshot verification failed for: {failed}")
     total = sum(int(f["size"] or 0) for f in files)
@@ -95,6 +112,8 @@ def download_and_verify(cfg: ModelConfig) -> dict[str, Any]:
         "revision": cfg.revision,
         "resolved_commit": info.sha,
         "files": files,
+        "verified_sha256": sum("sha256_ok" in f for f in files),
+        "verified_git_blob": sum("git_blob_ok" in f for f in files),
         "total_size_gb": round(total / 1024**3, 3),
         "seconds": round(time.perf_counter() - started, 1),
         # Only the cache-relative location: absolute paths can contain the user name.

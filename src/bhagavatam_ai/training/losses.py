@@ -81,10 +81,13 @@ def fused_causal_lm_loss(
         raise RuntimeError("torch.nn.functional.linear_cross_entropy needs torch >= 2.13")
     hidden = hidden_states[:, :-1, :].reshape(-1, hidden_states.size(-1))
     targets = labels[:, 1:].reshape(-1).to(hidden.device)
-    loss: torch.Tensor = F.linear_cross_entropy(
-        hidden, lm_head_weight, targets, ignore_index=ignore_index, options=options_cls()
+    # Per-row losses reduced in float32: with bf16 inputs the op's own mean accumulates in bf16 and
+    # was measured 1.5 nats (15 %) off at ~2k rows; acc_dtype=float32 did not change that.
+    rows = F.linear_cross_entropy(
+        hidden, lm_head_weight, targets, ignore_index=ignore_index, reduction="none", options=options_cls()
     )
-    return loss
+    num_valid = (targets != ignore_index).sum().clamp(min=1)
+    return rows.float().sum() / num_valid.to(torch.float32)
 
 
 def causal_lm_loss(

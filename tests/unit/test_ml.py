@@ -115,6 +115,24 @@ def test_loss_gradients_match_and_ignore_index() -> None:
             assert torch.allclose(got, want, atol=1e-6)
 
 
+@pytest.mark.parametrize("mode", ["chunked", "fused"])
+def test_memory_efficient_losses_are_accurate_in_bf16(mode: str) -> None:
+    """bf16 inputs (the MPS training dtype): the reported loss must match an fp64 reference."""
+    gen = torch.Generator().manual_seed(0)
+    hidden = (torch.randn(1, 1025, 128, generator=gen) * 0.5).to(torch.bfloat16)
+    weight = (torch.randn(4096, 128, generator=gen) * 0.05).to(torch.bfloat16)
+    labels = torch.randint(0, 4096, (1, 1025), generator=gen)
+    reference = torch.nn.functional.cross_entropy(
+        hidden[0, :-1].double() @ weight.double().T, labels[0, 1:]
+    ).item()
+    if mode == "chunked":
+        loss = chunked_causal_lm_loss(hidden, weight, labels, chunk_size=128)
+    else:
+        loss = fused_causal_lm_loss(hidden, weight, labels)
+    assert loss.dtype == torch.float32
+    assert abs(loss.item() - reference) < 5e-3, (loss.item(), reference)
+
+
 def test_chunked_loss_validation() -> None:
     with pytest.raises(ValueError, match="expected hidden_states"):
         chunked_causal_lm_loss(torch.zeros(2, 3), torch.zeros(4, 3), torch.zeros(2, 3, dtype=torch.long))
@@ -356,3 +374,112 @@ def test_repeated_ngram_ratio() -> None:
     assert repeated_ngram_ratio("") == 0.0
     assert repeated_ngram_ratio("a b c d e f") == 0.0
     assert repeated_ngram_ratio("a b c a b c a b c") > 0.5
+
+
+# --------------------------------------------------------------------------- review regressions (HW-1..4, F1)
+
+
+def _hw_cfg() -> Any:
+    from bhagavatam_ai.config import HardwareCheckConfig
+
+    return HardwareCheckConfig.model_validate(
+        {
+            "device": "cpu",
+            "training": {"loss": "chunked", "loss_chunk_size": 8, "warmup_steps": 0, "measured_steps": 1},
+        }
+    )
+
+
+def _lora_tiny(tiny_model: Any, repo_root: Path) -> Any:
+    import copy
+
+    targets = load_model_config(repo_root / "configs/model.yaml").lora_target_modules
+    return build_lora_model(
+        copy.deepcopy(tiny_model), LoraSettings(r=4, alpha=8), targets, gradient_checkpointing=False
+    )
+
+
+def test_trainer_refuses_nonfinite_updates(tiny_model: Any, repo_root: Path) -> None:
+    from bhagavatam_ai.hardware.benchmark import NonFiniteError, _Trainer, _verdict
+
+    model = _lora_tiny(tiny_model, repo_root)
+    trainer = _Trainer(model, torch.device("cpu"), _hw_cfg(), learning_rate=1e-3)
+    poisoned = trainer.params[0]
+    with torch.no_grad():
+        poisoned.fill_(float("nan"))
+    before = [p.detach().clone() for p in trainer.params[1:]]
+    ids = torch.randint(0, 512, (1, 24), generator=torch.Generator().manual_seed(3))
+    with pytest.raises(NonFiniteError):
+        trainer.step(ids)
+    assert all(
+        torch.equal(a, b) for a, b in zip(before, trainer.params[1:], strict=True)
+    )  # no update applied
+    assert not trainer.optimizer.state  # the optimizer never stepped
+    entry = trainer.measure(ids, mode="chunked")
+    assert entry["status"] == "nonfinite"
+    report = _report(
+        sweep=[
+            {**entry},
+            {
+                "seq_len": 16,
+                "status": "ok",
+                "tokens_per_s": 1.0,
+                "hours_per_million_tokens": 1.0,
+                "memory_pressure": False,
+                "loss_mode": "chunked",
+            },
+        ]
+    )
+    verdict = _verdict(report, _hw_cfg())
+    assert not verdict["lora_training_ok"] and verdict["nonfinite_runs"] and not verdict["checks_ok"]
+
+
+class _GenerationStubTokenizer:
+    pad_token_id = 0
+    eos_token_id = 1
+
+    def __call__(self, text: str, return_tensors: str | None = None, add_special_tokens: bool = True) -> Any:
+        from transformers import BatchEncoding
+
+        ids = torch.tensor([[5, 6, 7, 8, 9, 10]])
+        return BatchEncoding({"input_ids": ids, "attention_mask": torch.ones_like(ids)})
+
+    def decode(self, ids: Any, skip_special_tokens: bool = True) -> str:
+        return " ".join(str(int(i)) for i in ids)
+
+
+def test_generation_check_validates_cached_decoding(tiny_model: Any) -> None:
+    import copy
+
+    from bhagavatam_ai.hardware.benchmark import _generation
+
+    good = _generation(tiny_model, _GenerationStubTokenizer(), torch.device("cpu"), 6)
+    assert (
+        good["ok"] and good["logits_finite"] and good["cache_consistency"] == 1.0 and good["new_tokens"] == 6
+    )
+    broken = copy.deepcopy(tiny_model)
+    with torch.no_grad():
+        broken.model.norm.weight.fill_(float("nan"))
+    bad = _generation(broken, _GenerationStubTokenizer(), torch.device("cpu"), 6)
+    assert not bad["logits_finite"] and not bad["ok"]  # used to pass: token count was forced
+
+
+def test_stage_failures_are_recorded_not_raised() -> None:
+    from bhagavatam_ai.hardware.benchmark import _skip, _stage, _verdict
+
+    report: dict[str, Any] = {"device": "mps", "dtype": "bfloat16"}
+
+    def boom() -> None:
+        raise RuntimeError("MPS backend out of memory (MPS allocated: 9 GiB)")
+
+    assert _stage(report, "training", boom) is None
+    assert report["training"]["status"] == "oom"
+    _skip(report, ("generation",), "test")
+    verdict = _verdict(report, _hw_cfg())
+    assert verdict["failed_stages"] == ["generation", "training"]
+    assert verdict["failed_ops"] == ["op_checks stage did not complete"] and not verdict["ready_for_phase2"]
+
+
+def test_checks_ok_is_device_independent() -> None:
+    verdict = _verdict(_report(device="cpu"), _hw_cfg())
+    assert verdict["checks_ok"] and not verdict["ready_for_phase2"]
