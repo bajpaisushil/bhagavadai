@@ -168,6 +168,7 @@ def test_corpus_only_contains_trainable_sources_split_by_chapter(
         usage={"download": True, "metadata": True, "training_text": True},
         parser=fake_english_parser,
         downloads=[{"url": "https://example.org/en.txt", "filename": "en.txt", "format": "txt"}],
+        review_status="adversarially_verified",
     )
     _write_manifest(project, [_source("mini-sanskrit"), english])
     data_cfg = project / "configs/data.yaml"

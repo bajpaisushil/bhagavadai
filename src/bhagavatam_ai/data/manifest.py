@@ -7,16 +7,27 @@ parsed into a corpus or trained on by accident - even if someone adds a URL for 
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Literal
-from urllib.parse import urlsplit
+from typing import Final, Literal
 
+import httpx
 import yaml
 from pydantic import ValidationError
 
 from bhagavatam_ai.data.schema import SourceEntry, SourceManifest
 
 Purpose = Literal["download", "metadata", "training_text", "evaluation_reference"]
+
+# Policy invariant: always blocked, whatever a config file says (BBT / Prabhupada copyrighted text).
+ALWAYS_BLOCKED: Final = (
+    "vedabase.io",
+    "vedabase.com",
+    "bbt.org",
+    "bbt.info",
+    "bbtmedia.com",
+    "prabhupadabooks.com",
+)
 
 
 class ManifestError(RuntimeError):
@@ -53,12 +64,23 @@ def require_usage(entry: SourceEntry, purpose: Purpose) -> None:
         )
 
 
-def host_is_blocked(url: str, blocked_domains: tuple[str, ...]) -> bool:
-    host = (urlsplit(url).hostname or "").lower().rstrip(".")
-    return any(host == d or host.endswith("." + d) for d in (b.lower().lstrip(".") for b in blocked_domains))
+def normalize_domain(domain: str) -> str:
+    return domain.strip().lower().strip(".")
 
 
-def require_url_allowed(url: str, blocked_domains: tuple[str, ...]) -> None:
+def connect_host(url: str | httpx.URL) -> str:
+    """The host httpx will actually connect to: IDNA-normalised (so U+3002 etc. become '.'), lower-case,
+    without userinfo, port or trailing dot. Checking any other parse of the URL can be bypassed."""
+    return normalize_domain(httpx.URL(url).host if isinstance(url, str) else url.host)
+
+
+def host_is_blocked(url: str | httpx.URL, blocked_domains: Iterable[str]) -> bool:
+    host = connect_host(url)
+    domains = {normalize_domain(d) for d in (*ALWAYS_BLOCKED, *blocked_domains) if normalize_domain(d)}
+    return any(host == d or host.endswith("." + d) for d in domains)
+
+
+def require_url_allowed(url: str | httpx.URL, blocked_domains: Iterable[str]) -> None:
     if host_is_blocked(url, blocked_domains):
         raise LicenseGateError(f"Refusing to fetch {url}: domain is on the project's blocklist")
 

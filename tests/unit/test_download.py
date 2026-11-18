@@ -145,6 +145,92 @@ def test_blocked_domain_and_licence_gate(tmp_path: Path) -> None:
         download_source(no_download, tmp_path, CFG, (), client=Server([]).client())
 
 
+def test_redirect_to_blocked_domain_is_refused_before_fetching(tmp_path: Path) -> None:
+    seen: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(str(request.url))
+        if request.url.path == "/robots.txt":
+            return httpx.Response(404)
+        if request.url.host == "mirror.example.org":
+            return httpx.Response(302, headers={"location": "https://vedabase.io/en/library/sb/1/1/1/"})
+        return httpx.Response(200, content=b"BBT TEXT")
+
+    client = httpx.Client(transport=httpx.MockTransport(handler), follow_redirects=True)
+    with pytest.raises(LicenseGateError, match="blocklist"):
+        download_source(
+            _entry(url="https://mirror.example.org/a.xml", sha=None), tmp_path, CFG, (), client=client
+        )
+    assert not any("vedabase.io" in url for url in seen)  # no request ever reached the blocked host
+    assert not (tmp_path / "src" / "a.xml").exists()
+
+
+def test_https_downgrade_redirect_is_refused(tmp_path: Path) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/robots.txt":
+            return httpx.Response(404)
+        if request.url.scheme == "https":
+            return httpx.Response(301, headers={"location": "http://example.org/a.xml"})
+        return httpx.Response(200, content=PAYLOAD)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler), follow_redirects=True)
+    with pytest.raises(LicenseGateError, match="non-HTTPS"):
+        download_source(_entry(), tmp_path, CFG, (), client=client)
+
+
+def test_final_url_recorded_after_redirect(tmp_path: Path) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/robots.txt":
+            return httpx.Response(404)
+        if request.url.path == "/a.xml":
+            return httpx.Response(302, headers={"location": "https://example.org/moved/a.xml"})
+        return httpx.Response(200, content=PAYLOAD)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler), follow_redirects=True)
+    result = download_source(_entry(), tmp_path, CFG, (), client=client)[0]
+    assert result.final_url == "https://example.org/moved/a.xml"
+    assert read_json(tmp_path / "src" / "PROVENANCE.json")["files"][0]["final_url"] == result.final_url
+
+
+@pytest.mark.parametrize(
+    ("robots_status", "outcome"),
+    [
+        (404, "downloaded"),
+        (410, "downloaded"),
+        (403, "disallowed"),
+        (401, "disallowed"),
+        (503, "unreachable"),
+        (429, "unreachable"),
+        (500, "unreachable"),
+    ],
+)
+def test_robots_txt_status_handling_follows_rfc9309(tmp_path: Path, robots_status: int, outcome: str) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/robots.txt":
+            return httpx.Response(robots_status)
+        return httpx.Response(200, content=PAYLOAD)
+
+    client = httpx.Client(transport=httpx.MockTransport(handler))
+    if outcome == "downloaded":
+        assert download_source(_entry(), tmp_path, CFG, (), client=client)[0].status == "downloaded"
+    else:
+        expected = r"robots\.txt disallows" if outcome == "disallowed" else r"unreachable|returned HTTP"
+        with pytest.raises(DownloadError, match=expected):
+            download_source(_entry(), tmp_path, CFG, (), client=client)
+
+
+def test_robots_txt_network_error_blocks_download(tmp_path: Path) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/robots.txt":
+            raise httpx.ConnectTimeout("timeout", request=request)
+        return httpx.Response(200, content=PAYLOAD)
+
+    with pytest.raises(DownloadError, match="unreachable"):
+        download_source(
+            _entry(), tmp_path, CFG, (), client=httpx.Client(transport=httpx.MockTransport(handler))
+        )
+
+
 def test_transport_errors_are_retried(tmp_path: Path) -> None:
     calls = {"n": 0}
 

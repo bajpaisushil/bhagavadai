@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Literal, TypeVar
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 DTypeName = Literal["float32", "bfloat16", "float16"]
 DevicePreference = Literal["auto", "mps", "cuda", "cpu"]
@@ -156,7 +156,15 @@ class ValidationConfig(StrictModel):
 class DataConfig(StrictModel):
     manifest: Path = Path("data/manifests/sources.yaml")
     expected_structure: Path = Path("data/reference/expected_structure.json")
+    verse_equivalences: Path = Path("data/reference/verse_equivalences.json")
+    # Added to the always-blocked BBT domains (bhagavatam_ai.data.manifest.ALWAYS_BLOCKED).
     blocked_domains: tuple[str, ...] = ()
+
+    @field_validator("blocked_domains")
+    @classmethod
+    def _normalise_domains(cls, value: tuple[str, ...]) -> tuple[str, ...]:
+        return tuple(d for d in (v.strip().lower().strip(".") for v in value) if d)
+
     download: DownloadConfig = DownloadConfig()
     split: SplitConfig = SplitConfig()
     dedup: DedupConfig = DedupConfig()

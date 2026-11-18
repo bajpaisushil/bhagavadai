@@ -41,6 +41,7 @@ def _entry(**overrides: Any) -> dict[str, Any]:
         "evidence": [{"url": "https://example.org", "quote": "q", "retrieved_on": "2026-11-18"}],
         "downloads": [{"url": "https://example.org/a.txt", "filename": "a.txt", "format": "txt"}],
         "reviewed_on": "2026-11-18",
+        "review_status": "adversarially_verified",
     }
     base.update(overrides)
     return base
@@ -74,7 +75,13 @@ def test_valid_entry() -> None:
     ("overrides", "message"),
     [
         ({"permission_status": "under_review"}, "training_text requires status"),
-        ({"ml_training": "not_allowed"}, "conflicts with ml_training"),
+        ({"ml_training": "not_allowed"}, "requires ml_training=allowed"),
+        ({"ml_training": "unclear"}, "requires ml_training=allowed"),
+        ({"review_status": "researched"}, "requires review_status"),
+        (
+            {"downloads": [{"url": "https://vedabase\u3002io/a", "filename": "a", "format": "t"}]},
+            "should match pattern",
+        ),
         ({"permission_status": "excluded", "usage": {}}, "must not list downloads"),
         (
             {"permission_status": "excluded", "usage": {"metadata": True}, "downloads": []},
@@ -144,6 +151,33 @@ def test_get_source_and_sources_for() -> None:
 )
 def test_domain_blocklist(url: str, blocked: bool) -> None:
     assert host_is_blocked(url, ("vedabase.io",)) is blocked
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://vedabase\u3002io/en/library/sb/1/1/1/",  # ideographic full stop
+        "https://VEDABASE\uff0eIO./x",  # fullwidth full stop + trailing dot
+        "https://www\uff61vedabase\u3002io/x",  # halfwidth ideographic full stop
+        "https://user:pw@vedabase.io:443/x",
+    ],
+)
+def test_blocklist_uses_the_host_httpx_connects_to(url: str) -> None:
+    assert host_is_blocked(url, ("vedabase.io",))
+
+
+def test_bbt_domains_blocked_even_with_empty_config() -> None:
+    for url in ("https://vedabase.io/x", "https://www.bbt.org/x", "https://prabhupadabooks.com/x"):
+        assert host_is_blocked(url, ())
+
+
+def test_data_config_normalises_blocked_domains() -> None:
+    from bhagavatam_ai.config import DataConfig
+
+    assert DataConfig(blocked_domains=(" Example.ORG. ", "", ".foo.io")).blocked_domains == (
+        "example.org",
+        "foo.io",
+    )
 
 
 def test_require_url_allowed() -> None:

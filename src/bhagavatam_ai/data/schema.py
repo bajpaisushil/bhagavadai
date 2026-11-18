@@ -51,7 +51,8 @@ class Evidence(Strict):
 
 
 class DownloadSpec(Strict):
-    url: str = Field(pattern=r"^https://")
+    # ASCII only: non-ASCII hosts (e.g. U+3002 as a dot) can be parsed differently by different tools.
+    url: str = Field(pattern=r"^https://[\x21-\x7e]+$")
     filename: str = Field(pattern=r"^[A-Za-z0-9._-]+$")
     format: str
     sha256: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
@@ -110,8 +111,15 @@ class SourceEntry(Strict):
                     f"{self.id}: training_text requires status in {sorted(TRAINABLE_STATUSES)}, "
                     f"got {self.permission_status}"
                 )
-            if self.ml_training == "not_allowed":
-                raise ValueError(f"{self.id}: training_text conflicts with ml_training=not_allowed")
+            if self.ml_training != "allowed":
+                raise ValueError(
+                    f"{self.id}: training_text requires ml_training=allowed, got {self.ml_training}"
+                )
+            if self.review_status == "researched":
+                raise ValueError(
+                    f"{self.id}: training_text requires review_status "
+                    "adversarially_verified or legal_reviewed"
+                )
         if self.permission_status in {PermissionStatus.EXCLUDED, PermissionStatus.PERMISSION_REQUIRED}:
             granted = [name for name, value in self.usage.model_dump().items() if value]
             if granted:

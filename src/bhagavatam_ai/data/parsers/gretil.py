@@ -30,7 +30,7 @@ from typing import Final
 from bhagavatam_ai.data.parsers.base import ParsedDocument, ParsedVerse, ParserError, register
 
 PARSER_NAME: Final = "gretil_tei_bhp"
-PARSER_VERSION: Final = "1.1.0"
+PARSER_VERSION: Final = "1.2.0"
 
 _ID: Final = r"BhP_(?P<c>\d{2})\.(?P<ch>\d{2})\.(?P<v>\d{3})(?:_(?P<part>\d))?"
 _VERSE_END: Final = re.compile(
@@ -39,6 +39,7 @@ _VERSE_END: Final = re.compile(
 _SPEAKER: Final = re.compile(rf"^{_ID}/0(?:\s+(?P<spk>.+?))?\s*$")
 _TAG_BREAK: Final = re.compile(r"</?(?:l|lg|p|div|head|ab)\b[^>]*>")
 _ANY_TAG: Final = re.compile(r"<[^>]+>")
+_SENTINEL: Final = "\x00"
 _STRAY: Final = re.compile(r"[#\\]")
 _LICENCE: Final = re.compile(r'<licence\s+target="([^"]+)"')
 
@@ -49,13 +50,16 @@ def _body_lines(raw: str) -> list[tuple[int, str]]:
     if start < 0 or end < 0:
         raise ParserError("no <body> element found")
     first_line = raw.count("\n", 0, start) + 1
-    body = _TAG_BREAK.sub("\n", raw[start:end])
-    body = html.unescape(html.unescape(_ANY_TAG.sub("", body)))
     lines: list[tuple[int, str]] = []
-    for offset, line in enumerate(body.split("\n")):
-        stripped = line.strip()
-        if stripped:
-            lines.append((first_line + offset, stripped))
+    # Split on the file's real newlines first so line numbers stay true to the raw file; element
+    # boundaries inside a physical line become a sentinel that separates logical lines.
+    for offset, physical in enumerate(raw[start:end].split("\n")):
+        text = _TAG_BREAK.sub(_SENTINEL, physical)
+        text = html.unescape(html.unescape(_ANY_TAG.sub("", text)))
+        for logical in text.split(_SENTINEL):
+            stripped = logical.strip()
+            if stripped:
+                lines.append((first_line + offset, stripped))
     # A bare speaker ID with the speaker on the following line (5.15.1): join them.
     joined: list[tuple[int, str]] = []
     for number, line in lines:

@@ -1,8 +1,13 @@
 """Licence-gated, reproducible downloads of raw source files.
 
-For each manifest download entry: check the licence gate and domain blocklist, honour robots.txt,
-fetch with retries and back-off (respecting ``Retry-After``), enforce a size limit, write atomically,
-verify the pinned SHA-256 when the manifest has one, and record provenance next to the file.
+For each manifest download entry: check the licence gate, honour robots.txt (RFC 9309), fetch with
+retries and back-off (respecting ``Retry-After``), enforce a size limit, write atomically, verify the
+pinned SHA-256 when the manifest has one, and record provenance (including the final URL after any
+redirects) next to the file.
+
+The HTTPS-only rule and the domain blocklist are enforced by an httpx request hook on *every* request
+the client sends - robots.txt, each redirect hop and the final fetch - so a permitted URL that redirects
+to a blocked domain is refused before any byte is requested from it.
 """
 
 from __future__ import annotations
@@ -14,13 +19,12 @@ from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from urllib.parse import urlsplit
 from urllib.robotparser import RobotFileParser
 
 import httpx
 
 from bhagavatam_ai.config import DownloadConfig
-from bhagavatam_ai.data.manifest import require_url_allowed, require_usage
+from bhagavatam_ai.data.manifest import LicenseGateError, connect_host, require_url_allowed, require_usage
 from bhagavatam_ai.data.schema import DownloadSpec, SourceEntry
 from bhagavatam_ai.utils.hashing import sha256_file
 from bhagavatam_ai.utils.io import atomic_write_bytes, read_json, write_json
@@ -37,6 +41,7 @@ class DownloadError(RuntimeError):
 class DownloadResult:
     source_id: str
     url: str
+    final_url: str | None  # after redirects; None for cached files
     file: str
     status: str  # downloaded | cached
     sha256: str
@@ -47,25 +52,71 @@ class DownloadResult:
     retrieved_utc: str
 
 
+class RequestGuard:
+    """httpx request hook: refuse any request that is not HTTPS or targets a blocked domain."""
+
+    def __init__(self, blocked_domains: tuple[str, ...]) -> None:
+        self.blocked_domains = blocked_domains
+
+    def __call__(self, request: httpx.Request) -> None:
+        if request.url.scheme != "https":
+            raise LicenseGateError(f"Refusing non-HTTPS request to {request.url}")
+        require_url_allowed(request.url, self.blocked_domains)
+
+
+def guarded(client: httpx.Client, guard: RequestGuard) -> httpx.Client:
+    """Install ``guard`` as a request hook on ``client`` (idempotent)."""
+    hooks = dict(client.event_hooks)
+    requests = [h for h in hooks.get("request", []) if not isinstance(h, RequestGuard)]
+    hooks["request"] = [guard, *requests]
+    client.event_hooks = hooks
+    return client
+
+
+@dataclass(frozen=True)
+class _RobotsRules:
+    """Parsed robots.txt, or a blanket verdict when the file is absent (allow) or forbidden (deny)."""
+
+    parser: RobotFileParser | None = None
+    allow_everything: bool = False
+
+    def can_fetch(self, user_agent: str, url: str) -> bool:
+        return self.allow_everything if self.parser is None else self.parser.can_fetch(user_agent, url)
+
+
 class RobotsCache:
+    """robots.txt per origin, following RFC 9309 section 2.3.1: 2xx -> parse; 401/403 -> disallow all;
+    other 4xx -> allow all; 5xx, 429 or network errors -> unreachable, so nothing may be fetched."""
+
     def __init__(self, client: httpx.Client, user_agent: str) -> None:
         self._client = client
         self._user_agent = user_agent
-        self._parsers: dict[str, RobotFileParser] = {}
+        self._rules: dict[str, _RobotsRules] = {}
+
+    def _fetch_rules(self, origin: str) -> _RobotsRules:
+        try:
+            response = self._client.get(f"{origin}/robots.txt")
+        except httpx.HTTPError as exc:
+            raise DownloadError(
+                f"robots.txt at {origin} unreachable ({type(exc).__name__}); retry later"
+            ) from exc
+        status = response.status_code
+        if 200 <= status < 300:
+            parser = RobotFileParser()
+            parser.parse(response.text.splitlines())
+            return _RobotsRules(parser=parser)
+        if status in {401, 403}:
+            return _RobotsRules(allow_everything=False)
+        if 400 <= status < 500 and status != 429:
+            return _RobotsRules(allow_everything=True)
+        raise DownloadError(f"robots.txt at {origin} returned HTTP {status}; retry later")
 
     def allowed(self, url: str) -> bool:
-        parts = urlsplit(url)
-        origin = f"{parts.scheme}://{parts.netloc}"
-        if origin not in self._parsers:
-            parser = RobotFileParser()
-            try:
-                response = self._client.get(f"{origin}/robots.txt")
-                lines = response.text.splitlines() if response.status_code == 200 else []
-            except httpx.HTTPError:
-                lines = []  # unreachable robots.txt: treat as no restrictions (standard behaviour)
-            parser.parse(lines)
-            self._parsers[origin] = parser
-        return self._parsers[origin].can_fetch(self._user_agent, url)
+        parsed = httpx.URL(url)
+        origin = f"{parsed.scheme}://{connect_host(parsed)}" + (f":{parsed.port}" if parsed.port else "")
+        if origin not in self._rules:
+            self._rules[origin] = self._fetch_rules(origin)
+        return self._rules[origin].can_fetch(self._user_agent, url)
 
 
 def _retry_delay(attempt: int, cfg: DownloadConfig, retry_after: str | None) -> float:
@@ -126,8 +177,10 @@ def download_source(
     provenance_path = target_dir / "PROVENANCE.json"
     previous = {r["file"]: r for r in read_json(provenance_path)["files"]} if provenance_path.exists() else {}
     owns_client = client is None
-    http = client or httpx.Client(
-        headers={"User-Agent": cfg.user_agent}, timeout=cfg.timeout_s, follow_redirects=True
+    http = guarded(
+        client
+        or httpx.Client(headers={"User-Agent": cfg.user_agent}, timeout=cfg.timeout_s, follow_redirects=True),
+        RequestGuard(blocked_domains),
     )
     robots = RobotsCache(http, cfg.user_agent)
     results: list[DownloadResult] = []
@@ -140,16 +193,17 @@ def download_source(
                     old = previous.get(spec.filename, {})
                     results.append(
                         DownloadResult(
-                            entry.id,
-                            spec.url,
-                            spec.filename,
-                            "cached",
-                            digest,
-                            path.stat().st_size,
-                            old.get("http_status"),
-                            old.get("content_type"),
-                            old.get("last_modified"),
-                            old.get("retrieved_utc", ""),
+                            source_id=entry.id,
+                            url=spec.url,
+                            final_url=old.get("final_url"),
+                            file=spec.filename,
+                            status="cached",
+                            sha256=digest,
+                            bytes=path.stat().st_size,
+                            http_status=old.get("http_status"),
+                            content_type=old.get("content_type"),
+                            last_modified=old.get("last_modified"),
+                            retrieved_utc=old.get("retrieved_utc", ""),
                         )
                     )
                     continue
@@ -166,16 +220,17 @@ def download_source(
                 raise DownloadError(f"{spec.filename}: sha256 {digest} does not match pinned {spec.sha256}")
             results.append(
                 DownloadResult(
-                    entry.id,
-                    spec.url,
-                    spec.filename,
-                    "downloaded",
-                    digest,
-                    len(data),
-                    response.status_code,
-                    response.headers.get("content-type"),
-                    response.headers.get("last-modified"),
-                    datetime.now(UTC).isoformat(timespec="seconds"),
+                    source_id=entry.id,
+                    url=spec.url,
+                    final_url=str(response.url),
+                    file=spec.filename,
+                    status="downloaded",
+                    sha256=digest,
+                    bytes=len(data),
+                    http_status=response.status_code,
+                    content_type=response.headers.get("content-type"),
+                    last_modified=response.headers.get("last-modified"),
+                    retrieved_utc=datetime.now(UTC).isoformat(timespec="seconds"),
                 )
             )
     finally:
