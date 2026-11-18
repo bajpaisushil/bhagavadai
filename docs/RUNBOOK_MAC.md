@@ -15,7 +15,6 @@ machine itself: the development codespace has no Apple GPU.
 
 ```bash
 git clone https://github.com/bajpaisushil/bhagavadai && cd bhagavadai
-git checkout phase-1-foundation        # until it is merged
 make setup                             # Python 3.12 + locked deps (torch 2.15 with MPS)
 scripts/mac_phase1.sh                  # ~15-30 minutes
 ```
