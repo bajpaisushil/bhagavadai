@@ -115,11 +115,18 @@ _TOKEN_RE: Final = re.compile("|".join(re.escape(t) for t in _TOKENS) + r"|.", r
 
 
 def iast_to_devanagari(text: str) -> str:
-    """Transliterate IAST to Devanagari. Hyphens (compound separators) are removed first."""
-    source = normalize_iast(text).lower().replace("-", "")
+    """Transliterate IAST to Devanagari.
+
+    A hyphen (compound separator) emits nothing but still separates tokens: consonants across it join
+    into a conjunct (``tat-tvam`` -> तत्त्वम्), while vowels across it stay in hiatus (``mana-indriya`` ->
+    मनइन्द्रिय, not the diphthong ``ai``).
+    """
+    source = normalize_iast(text).lower()
     out: list[str] = []
     pending_consonant = False
     for token in _TOKEN_RE.findall(source):
+        if token == "-":
+            continue
         if token in _CONSONANTS:
             if pending_consonant:
                 out.append(_VIRAMA)

@@ -180,6 +180,8 @@ class VerseRecord(Strict):
     alt_scripts: dict[str, str] = Field(default_factory=dict)
     speaker_raw: str | None = None
     speaker: str | None = None  # canonical name when unambiguous
+    # "explicit": a speaker line precedes this verse; "carried_forward": inferred from an earlier one.
+    speaker_source: Literal["explicit", "carried_forward"] | None = None
     flags: tuple[str, ...] = ()
     provenance: Provenance
 

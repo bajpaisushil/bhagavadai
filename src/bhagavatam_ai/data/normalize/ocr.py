@@ -14,6 +14,7 @@ from typing import Final
 
 _PAGE_NUMBER: Final = re.compile(r"^\s*[\[(]?(?:\d{1,4}|[ivxlcdm]{1,7})[\])]?\s*$", re.IGNORECASE)
 _WORD: Final = re.compile(r"[^\W\d_]+(?:['’][^\W\d_]+)*", re.UNICODE)
+_HYPHENATED: Final = re.compile(r"[^\W\d_]+(?:-[^\W\d_]+)+", re.UNICODE)
 _TRAILING_HYPHEN: Final = re.compile(r"([^\W\d_]+)-$", re.UNICODE)
 _LEADING_WORD: Final = re.compile(r"^([^\W\d_]+)(.*)$", re.UNICODE | re.DOTALL)
 _DIACRITICS: Final = frozenset("āīūṛṝḷḹṃṁḥṅñṭḍṇśṣĀĪŪṚṜḶḸṂṀḤṄÑṬḌṆŚṢ")
@@ -72,18 +73,21 @@ def strip_page_furniture(
 
 
 def build_vocabulary(texts: Iterable[str]) -> Counter[str]:
-    """Lower-cased word frequencies, excluding both halves of words broken across a line end."""
+    """Lower-cased word frequencies, plus intra-line hyphenated forms ("co-operate"), excluding both
+    halves of words broken across a line end."""
     vocab: Counter[str] = Counter()
     for text in texts:
         previous_broken = False
         for line in text.splitlines():
-            words = _WORD.findall(line)
-            broken = line.rstrip().endswith("-") and bool(words)
-            if broken:
-                words = words[:-1]
-            if previous_broken and words and line.lstrip()[:1].isalpha():
-                words = words[1:]
-            vocab.update(w.lower() for w in words)
+            body = line.rstrip()
+            trailing = _TRAILING_HYPHEN.search(body)
+            broken = trailing is not None
+            if trailing is not None:  # drop the fragment before the line-end hyphen
+                body = body[: trailing.start(1)]
+            if previous_broken:  # drop the fragment continuing the previous line
+                body = _LEADING_WORD.sub(r"\2", body.lstrip(), count=1)
+            vocab.update(w.lower() for w in _WORD.findall(body))
+            vocab.update(h.lower() for h in _HYPHENATED.findall(body))
             previous_broken = broken
     return vocab
 
@@ -106,15 +110,16 @@ def dehyphenate(
     hyphen and are recorded in ``stats.ambiguous`` for review.
     """
     stats = stats if stats is not None else DehyphenationStats()
+    work = list(lines)
     out: list[str] = []
     i = 0
-    while i < len(lines):
-        line = lines[i].rstrip()
+    while i < len(work):
+        line = work[i].rstrip()
         match = _TRAILING_HYPHEN.search(line)
-        nxt = lines[i + 1].lstrip() if i + 1 < len(lines) else ""
+        nxt = work[i + 1].lstrip() if i + 1 < len(work) else ""
         lead = _LEADING_WORD.match(nxt) if match and nxt else None
         if not match or not lead:
-            out.append(lines[i])
+            out.append(work[i])
             i += 1
             continue
         left, right, rest = match.group(1), lead.group(1), lead.group(2)
@@ -127,8 +132,9 @@ def dehyphenate(
             merged = f"{left}-{right}"
             stats.kept_hyphen += 1
             stats.ambiguous.append(f"{left}-{right}")
-        out.append(line[: match.start(1)] + merged + rest)
-        i += 2
+        # Re-examine the merged line: it may itself end with a broken word.
+        work[i + 1] = line[: match.start(1)] + merged + rest
+        i += 1
     return out
 
 

@@ -66,6 +66,15 @@ def test_smoke_generation(loaded: Any) -> None:
     assert result["all_ok"]
 
 
+def test_cached_decoding_matches_full_forward(loaded: Any) -> None:
+    """The hardware check's generation test on the real model: finite logits, and the cached decode
+    (DeltaNet recurrent + conv state, KV cache) agrees with a no-cache teacher-forced forward pass."""
+    from bhagavatam_ai.hardware.benchmark import _generation
+
+    result = _generation(loaded[0], loaded[1], torch.device("cpu"), 12)
+    assert result["logits_finite"] and result["cache_consistency"] >= 0.9 and result["ok"], result
+
+
 def test_lora_step_on_real_model(loaded: Any, model_cfg: Any) -> None:
     """Runs last: trains adapters in place (no 3 GB deepcopy), then unloads them."""
     from bhagavatam_ai.config import LoraSettings

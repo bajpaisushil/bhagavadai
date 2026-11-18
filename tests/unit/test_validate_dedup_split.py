@@ -176,3 +176,16 @@ def test_split_rejects_bad_forced_chapter() -> None:
 def test_leakage_report() -> None:
     report = leakage_report({"t1": LONG, "t2": "train only text here"}, {"v1": LONG, "v2": "val only"}, DCFG)
     assert report["exact_cross_split_groups"] == 1 and report["near_duplicate_pairs"] == 1
+
+
+def test_equivalence_groups_are_transitive() -> None:
+    from bhagavatam_ai.data.split import equivalence_groups
+
+    texts = {
+        "a": LONG,
+        "b": LONG.replace("forest", "woods"),
+        "c": LONG.replace("forest", "woods") + " indeed",
+        "d": "unrelated text about something else entirely",
+    }
+    groups = equivalence_groups(texts, DCFG)
+    assert groups == [["a", "b", "c"]]

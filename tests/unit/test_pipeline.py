@@ -185,3 +185,85 @@ def test_corpus_only_contains_trainable_sources_split_by_chapter(
     val = list(iter_jsonl(project / "data/processed/cpt/val.jsonl"))
     assert {r["chapter"] for r in val} == {"3.25"} and all(r["source_id"] == "pd-english" for r in val)
     assert card["leakage"]["exact_cross_split_groups"] == 0
+
+
+@pytest.fixture
+def leaky_english_parser() -> Any:
+    """Simulates an edition that repeats verses: 1.1.1 == 3.25.1 verbatim; 1.1.2 renders the same Sanskrit
+    as 3.25.2 but with different English wording (only the Sanskrit-derived equivalence can catch it)."""
+    name = "test_leaky_english"
+    texts = {
+        (1, 1, 1): "The refrain is repeated word for word in two different chapters of the text.",
+        (1, 1, 2): "A first translator's wording of a verse that the edition repeats elsewhere.",
+        (3, 25, 1): "The refrain is repeated word for word in two different chapters of the text.",
+        (3, 25, 2): "Entirely different English for the very same Sanskrit verse, by the same hand.",
+        (3, 25, 3): "A verse that occurs only here and should stay in validation.",
+    }
+
+    def parse(path: Path) -> ParsedDocument:
+        verses = [
+            ParsedVerse(canto=c, chapter=ch, verse=v, text=t, locator=f"line {i}")
+            for i, ((c, ch, v), t) in enumerate(texts.items())
+        ]
+        return ParsedDocument(parser=name, parser_version="0", verses=verses)
+
+    _REGISTRY[name] = parse
+    yield name
+    _REGISTRY.pop(name)
+
+
+def test_repeated_verses_never_leak_into_validation(project: Path, leaky_english_parser: str) -> None:
+    (project / "data/raw/pd-english").mkdir(parents=True)
+    (project / "data/raw/pd-english/en.txt").write_text("fixture", encoding="utf-8")
+    english = _source(
+        "pd-english",
+        language="en",
+        content_roles=["english_translation"],
+        license="Public domain",
+        license_url=None,
+        commercial_use="allowed",
+        ml_training="allowed",
+        permission_status="public_domain",
+        usage={"download": True, "metadata": True, "training_text": True},
+        parser=leaky_english_parser,
+        downloads=[{"url": "https://example.org/en.txt", "filename": "en.txt", "format": "txt"}],
+        review_status="adversarially_verified",
+    )
+    _write_manifest(project, [english])
+    cfg = yaml.safe_load((project / "configs/data.yaml").read_text())
+    cfg["data"]["split"].update(forced_val_chapters=["3.25"], val_fraction=0.0)
+    (project / "configs/data.yaml").write_text(yaml.safe_dump(cfg), encoding="utf-8")
+    (project / "data/reference/verse_equivalences.json").write_text(
+        '{"groups": [["1.1.2", "3.25.2"]]}', encoding="utf-8"
+    )
+    ctx = _context(project)
+    parse_source(ctx, "pd-english")
+    card = build_corpus(ctx)
+    assert card["decontamination"]["by_reason"] == {
+        "equivalent_verse_in_train": 1,
+        "text_duplicate_in_train": 1,
+    }
+    val = list(iter_jsonl(project / "data/processed/cpt/val.jsonl"))
+    assert [r["ref"] for r in val] == ["SB 3.25.3"]
+    assert card["records"] == {"train": 2, "val": 1}  # training keeps every verse
+    assert card["leakage"]["exact_cross_split_groups"] == 0 and card["leakage"]["near_duplicate_pairs"] == 0
+
+
+def test_reference_writes_verse_equivalences(ctx: PipelineContext) -> None:
+    parse_source(ctx, "mini-sanskrit")
+    write_reference_structure(ctx, "mini-sanskrit")
+    equivalences = read_json(ctx.paths.reference / "verse_equivalences.json")
+    assert equivalences["derived_from"] == "mini-sanskrit" and isinstance(equivalences["groups"], list)
+
+
+def test_corpus_rows_mark_inferred_speakers(project: Path, fixtures_dir: Path) -> None:
+    raw = project / "data/raw/mini-sanskrit"
+    raw.mkdir(parents=True)
+    shutil.copy(fixtures_dir / "mini_gretil.xml", raw / "mini.xml")
+    _write_manifest(project, [_source("mini-sanskrit")])
+    ctx = _context(project)
+    parse_source(ctx, "mini-sanskrit")
+    records = {r.ref_key: r for r in load_records(ctx, "mini-sanskrit")}
+    assert records["1.1.2"].speaker_source == "explicit"
+    assert records["1.1.3"].speaker_source == "carried_forward"
+    assert records["1.1.1"].speaker_source is None

@@ -38,7 +38,13 @@ from bhagavatam_ai.data.schema import (
     SourceManifest,
     VerseRecord,
 )
-from bhagavatam_ai.data.split import leakage_report, plan_split
+from bhagavatam_ai.data.split import (
+    decontaminate,
+    equivalence_groups,
+    leakage_report,
+    plan_split,
+    summarize_removed,
+)
 from bhagavatam_ai.data.validate import Severity, ValidationReport, validate_records
 from bhagavatam_ai.paths import ProjectPaths
 from bhagavatam_ai.utils.hashing import sha256_file
@@ -102,6 +108,8 @@ def to_records(
                 flags.append("speaker_ambiguous")
             elif speaker is None:
                 flags.append(f"speaker_unmapped:{key}")
+            if "speaker_uncertain" in flags:
+                speaker = None  # never assert a name for a likely-wrong inferred attribution
         suffix = (f"_{v.part}" if v.part else "") + (f"#{v.variant}" if v.variant else "")
         records.append(
             VerseRecord(
@@ -119,6 +127,9 @@ def to_records(
                 alt_scripts=alt,
                 speaker_raw=normalize_iast(v.speaker_raw) if v.speaker_raw else None,
                 speaker=speaker,
+                speaker_source=("explicit" if v.speaker_explicit else "carried_forward")
+                if v.speaker_raw
+                else None,
                 flags=tuple(flags),
                 provenance=Provenance(
                     source_id=entry.id,
@@ -209,7 +220,39 @@ def write_reference_structure(ctx: PipelineContext, source_id: str) -> Path:
             },
         },
     )
+    write_verse_equivalences(ctx, source_id, records)
     return path
+
+
+def write_verse_equivalences(ctx: PipelineContext, source_id: str, records: list[VerseRecord]) -> Path:
+    """Persist which verses the edition repeats (identical or near-identical text): a fact used to keep
+    a repeated verse from reaching validation through one chapter and training through another."""
+    texts = {r.record_id: r.text for r in records}
+    ref_of = {r.record_id: r.ref_key for r in records}
+    groups = sorted(
+        refs
+        for refs in (
+            sorted({ref_of[k] for k in group}) for group in equivalence_groups(texts, ctx.config.dedup)
+        )
+        if len(refs) > 1
+    )
+    path = ctx.paths.resolve(ctx.config.verse_equivalences)
+    write_json(
+        path,
+        {
+            "description": "Groups of verses with identical or near-identical text in the reference edition.",
+            "derived_from": source_id,
+            "method": ctx.config.dedup.model_dump(),
+            "groups": groups,
+        },
+    )
+    return path
+
+
+def load_verse_equivalences(ctx: PipelineContext) -> list[list[str]]:
+    path = ctx.paths.resolve(ctx.config.verse_equivalences)
+    groups: list[list[str]] = read_json(path)["groups"] if path.exists() else []
+    return groups
 
 
 def load_reference_structure(ctx: PipelineContext) -> dict[str, int] | None:
@@ -249,14 +292,25 @@ def build_corpus(ctx: PipelineContext) -> dict[str, Any]:
                     "record_id": r.record_id,
                     "source_id": r.source_id,
                     "ref": f"SB {r.ref_key}",
+                    "ref_key": r.ref_key,
                     "chapter": r.chapter_key,
                     "role": r.role.value,
                     "language": r.language,
                     "text": r.text,
                     "speaker": r.speaker,
+                    # Inferred attributions must not be presented as fact downstream (e.g. in SFT data).
+                    "speaker_source": r.speaker_source,
                 }
             )
         per_source[entry.id] = counts
+    kept, removed = decontaminate(
+        rows["train"],
+        rows["val"],
+        ctx.config.dedup,
+        equivalent_refs=load_verse_equivalences(ctx),
+        is_train=lambda canto, chapter: plan.split_of(canto, chapter) == "train",
+    )
+    rows["val"] = [dict(r) for r in kept]
     for split_name, split_rows in rows.items():
         write_jsonl(out_dir / f"{split_name}.jsonl", split_rows)
     leakage = (
@@ -284,6 +338,7 @@ def build_corpus(ctx: PipelineContext) -> dict[str, Any]:
         ],
         "records": {split: len(split_rows) for split, split_rows in rows.items()},
         "characters": {split: sum(len(r["text"]) for r in split_rows) for split, split_rows in rows.items()},
+        "decontamination": summarize_removed(removed),
         "leakage": leakage,
         "note": None
         if eligible
@@ -293,4 +348,6 @@ def build_corpus(ctx: PipelineContext) -> dict[str, Any]:
         ),
     }
     write_json(out_dir / "dataset_card.json", card)
+    if leakage.get("exact_cross_split_groups") or leakage.get("near_duplicate_pairs"):
+        raise PipelineError(f"train/val leakage remains after decontamination: {leakage}")
     return card

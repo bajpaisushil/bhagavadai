@@ -7,10 +7,11 @@ abandoned request releases the model promptly instead of generating to ``max_new
 
 from __future__ import annotations
 
+import json
 import logging
 import threading
 import time
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
@@ -45,11 +46,22 @@ class ChatService(Protocol):
     def start(self, request: ChatRequest) -> Generation: ...
 
 
-def extract_references(text: str) -> list[Reference]:
+def extract_references(text: str, chapter_lengths: Mapping[str, int] | None = None) -> list[Reference]:
+    """Citations in ``text``; impossible ones (no such canto/chapter, or a verse beyond the chapter's last
+    verse when ``chapter_lengths`` is known) are marked invalid."""
     return [
         Reference(text=matched, ref=str(span) if span else None, valid=span is not None)
-        for matched, span in find_references(text)
+        for matched, span in find_references(text, chapter_lengths)
     ]
+
+
+def load_chapter_lengths(path: Path) -> dict[str, int] | None:
+    """Verse counts per chapter from ``data/reference/expected_structure.json`` (if it has been built)."""
+    try:
+        chapters: dict[str, int] = json.loads(path.read_text(encoding="utf-8"))["chapters"]
+    except (OSError, ValueError, KeyError):
+        return None
+    return chapters
 
 
 def build_messages(request: ChatRequest) -> list[dict[str, str]]:
@@ -100,12 +112,20 @@ class _TransformersGeneration:
 class TransformersChatService:
     """Serves the configured base model (plus an optional PEFT adapter from a later phase)."""
 
-    def __init__(self, model_config: Path, *, device: str = "auto", adapter: Path | None = None) -> None:
+    def __init__(
+        self,
+        model_config: Path,
+        *,
+        device: str = "auto",
+        adapter: Path | None = None,
+        chapter_lengths: Mapping[str, int] | None = None,
+    ) -> None:
         from bhagavatam_ai.config import load_model_config
         from bhagavatam_ai.hardware.device import dtype_for_device, select_device
         from bhagavatam_ai.modeling.loader import load_model, load_tokenizer, snapshot_dir
 
         self.cfg = load_model_config(model_config)
+        self.chapter_lengths = chapter_lengths
         self.device = select_device(device)  # type: ignore[arg-type]
         self.dtype = dtype_for_device(self.device, self.cfg.dtype)
         snapshot = snapshot_dir(self.cfg)

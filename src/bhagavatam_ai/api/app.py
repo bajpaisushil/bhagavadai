@@ -108,7 +108,7 @@ def _register_chat_routes(app: FastAPI, state: _State) -> None:
                 await _finish(generation)
         return ChatResponse(
             message=ChatMessage(role="assistant", content=text or "…"),
-            references=extract_references(text),
+            references=extract_references(text, getattr(service, "chapter_lengths", None)),
             usage=generation.usage(),
             finish_reason=generation.finish_reason(),
         )
@@ -134,7 +134,10 @@ def _register_chat_routes(app: FastAPI, state: _State) -> None:
                     yield _sse(
                         {
                             "type": "done",
-                            "references": [r.model_dump() for r in extract_references(text)],
+                            "references": [
+                                r.model_dump()
+                                for r in extract_references(text, getattr(service, "chapter_lengths", None))
+                            ],
                             "usage": generation.usage().model_dump(),
                             "finish_reason": generation.finish_reason(),
                         }
@@ -189,13 +192,17 @@ def create_app(service_factory: Callable[[], ChatService], settings: ApiSettings
 
 def create_default_app() -> FastAPI:
     """Entry point for ``uvicorn bhagavatam_ai.api.app:create_default_app --factory``."""
-    from bhagavatam_ai.api.service import TransformersChatService
+    from bhagavatam_ai.api.service import TransformersChatService, load_chapter_lengths
     from bhagavatam_ai.paths import ProjectPaths
 
     settings = ApiSettings.from_env()
     paths = ProjectPaths.discover()
     model_config = paths.resolve(settings.model_config)
     adapter = paths.resolve(settings.adapter) if settings.adapter else None
+    lengths = load_chapter_lengths(paths.reference / "expected_structure.json")
     return create_app(
-        lambda: TransformersChatService(model_config, device=settings.device, adapter=adapter), settings
+        lambda: TransformersChatService(
+            model_config, device=settings.device, adapter=adapter, chapter_lengths=lengths
+        ),
+        settings,
     )

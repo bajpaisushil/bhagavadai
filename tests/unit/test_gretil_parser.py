@@ -138,3 +138,22 @@ def test_real_gretil_file_matches_known_structure() -> None:
         11: 1366,
         12: 565,
     }
+
+
+def test_mismatched_speaker_label_is_not_carried_and_marks_earlier_inferences(tmp_path: Path) -> None:
+    xml = tmp_path / "t.xml"
+    xml.write_text(
+        "<TEI><text><body>\n"
+        "<p>BhP_01.01.001/0 sūta uvāca\n<lg><l>a // BhP_01.01.001 //</l></lg></p>\n"
+        "<lg><l>b // BhP_01.01.002 //</l></lg>\n"
+        "<lg><l>c // BhP_01.01.003 //</l></lg>\n"
+        "<p>BhP_01.01.002/0 rājovāca\n<lg><l>d // BhP_01.01.004 //</l></lg></p>\n"  # labelled 2, placed at 4
+        "<lg><l>e // BhP_01.01.005 //</l></lg>\n"
+        "</body></text></TEI>\n",
+        encoding="utf-8",
+    )
+    verses = {v.verse: v for v in parse_gretil_tei(xml).verses}
+    assert verses[2].flags == ["speaker_carried_forward", "speaker_uncertain"]
+    assert verses[3].flags == ["speaker_carried_forward", "speaker_uncertain"]
+    assert verses[4].speaker_explicit and "speaker_label_mismatch:1.1.2" in verses[4].flags
+    assert verses[5].speaker_raw is None  # nothing carried forward from a misplaced label

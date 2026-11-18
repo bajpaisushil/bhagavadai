@@ -1,11 +1,11 @@
 {
   "_meta": {
     "report": "model_download",
-    "run_id": "20261118T090433Z-26cb50",
-    "created_utc": "2026-11-18T09:04:41+00:00",
+    "run_id": "20261118T100735Z-8c8f7d",
+    "created_utc": "2026-11-18T10:07:44+00:00",
     "package_version": "0.1.0",
     "git": {
-      "commit": "9d8fab7e7127f9551f52dcafa498f4e59a3672ed",
+      "commit": "cae47f47231c32960ef89a32b7e323b89ef2762d",
       "dirty": true
     }
   },
@@ -16,27 +16,32 @@
     {
       "file": ".gitattributes",
       "size": 1570,
-      "present": true
+      "present": true,
+      "git_blob_ok": true
     },
     {
       "file": "LICENSE",
       "size": 11343,
-      "present": true
+      "present": true,
+      "git_blob_ok": true
     },
     {
       "file": "README.md",
       "size": 3727,
-      "present": true
+      "present": true,
+      "git_blob_ok": true
     },
     {
       "file": "config.json",
       "size": 2907,
-      "present": true
+      "present": true,
+      "git_blob_ok": true
     },
     {
       "file": "merges.txt",
       "size": 3353259,
-      "present": true
+      "present": true,
+      "git_blob_ok": true
     },
     {
       "file": "model.safetensors-00001-of-00001.safetensors",
@@ -48,12 +53,14 @@
     {
       "file": "model.safetensors.index.json",
       "size": 50900,
-      "present": true
+      "present": true,
+      "git_blob_ok": true
     },
     {
       "file": "preprocessor_config.json",
       "size": 390,
-      "present": true
+      "present": true,
+      "git_blob_ok": true
     },
     {
       "file": "tokenizer.json",
@@ -65,20 +72,25 @@
     {
       "file": "tokenizer_config.json",
       "size": 16712,
-      "present": true
+      "present": true,
+      "git_blob_ok": true
     },
     {
       "file": "video_preprocessor_config.json",
       "size": 386,
-      "present": true
+      "present": true,
+      "git_blob_ok": true
     },
     {
       "file": "vocab.json",
       "size": 6722759,
-      "present": true
+      "present": true,
+      "git_blob_ok": true
     }
   ],
+  "verified_sha256": 2,
+  "verified_git_blob": 10,
   "total_size_gb": 1.648,
-  "seconds": 7.6,
+  "seconds": 9.2,
   "cache_relative_path": "hub/models--Qwen--Qwen3.5-0.8B-Base/snapshots/dc7cdfe2ee4154fa7e30f5b51ca41bfa40174e68"
 }

@@ -8,6 +8,7 @@ not hard-coded here.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Final
 
@@ -35,8 +36,8 @@ _REF_RE: Final = re.compile(
 )
 # In free text, require an explicit "SB"-style prefix to avoid matching dates or section numbers.
 _FIND_RE: Final = re.compile(
-    r"\b(?:SB|Bhāg\.|Bhag\.|BhP|Bhāgavatam|Bhagavatam)\s*(?P<c>\d{1,2})\.(?P<ch>\d{1,2})\.(?P<v>\d{1,3})"
-    r"(?:\s*[-–]\s*(?P<end>\d{1,3}))?",
+    r"\b(?:SB|Bhāg\.|Bhag\.|BhP|Bhāgavatam|Bhagavatam)\s*(?P<c>\d+)\.(?P<ch>\d+)\.(?P<v>\d+)"
+    r"(?:\s*[-–]\s*(?P<end>\d+))?(?!\d)",
 )
 
 
@@ -120,11 +121,15 @@ def parse_reference(text: str) -> VerseSpan:
     return VerseSpan(start, int(match["end"]) if match["end"] else start.verse)
 
 
-def find_references(text: str) -> list[tuple[str, VerseSpan | None]]:
+def find_references(
+    text: str, chapter_lengths: Mapping[str, int] | None = None
+) -> list[tuple[str, VerseSpan | None]]:
     """Find ``SB x.y.z``-style citations in free text.
 
-    Returns ``(matched_text, span)`` pairs; ``span`` is ``None`` when the citation is structurally
-    impossible (e.g. ``SB 13.1.1``) - useful for detecting hallucinated references.
+    Returns ``(matched_text, span)`` pairs; ``span`` is ``None`` when the citation is impossible:
+    outside the 12-canto / 335-chapter structure (``SB 13.1.1``) or, when ``chapter_lengths`` (verse
+    counts per ``"canto.chapter"``) is given, beyond the chapter's last verse. Numbers are matched whole,
+    so ``SB 1.1.1000`` is never truncated into the valid-looking ``SB 1.1.100``.
     """
     found: list[tuple[str, VerseSpan | None]] = []
     for match in _FIND_RE.finditer(text):
@@ -133,6 +138,10 @@ def find_references(text: str) -> list[tuple[str, VerseSpan | None]]:
             span: VerseSpan | None = VerseSpan(start, int(match["end"]) if match["end"] else start.verse)
         except InvalidReferenceError:
             span = None
+        if span is not None and chapter_lengths is not None:
+            last = chapter_lengths.get(str(span.start.chapter_ref))
+            if last is not None and span.end_verse > last:
+                span = None
         found.append((match.group(0), span))
     return found
 

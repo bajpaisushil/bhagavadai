@@ -6,7 +6,7 @@ import json
 import threading
 import time
 from collections.abc import Iterator
-from typing import Any
+from typing import Any, ClassVar
 
 import pytest
 from fastapi.testclient import TestClient
@@ -14,7 +14,7 @@ from fastapi.testclient import TestClient
 from bhagavatam_ai.api.app import create_app
 from bhagavatam_ai.api.schemas import ChatRequest, ModelInfo, Usage
 
-CHUNKS = ["Śukadeva Gosvāmī ", "narrated it to Parīkṣit (SB 1.1.1).", " See SB 13.1.1."]
+CHUNKS = ["Śukadeva Gosvāmī ", "narrated it to Parīkṣit (SB 1.1.1).", " See SB 13.1.1 and SB 1.1.99."]
 
 
 class FakeGeneration:
@@ -43,6 +43,8 @@ class FakeGeneration:
 
 
 class FakeService:
+    chapter_lengths: ClassVar[dict[str, int]] = {"1.1": 23}  # as derived from the reference edition
+
     def __init__(self, gate: threading.Event | None = None) -> None:
         self.gate = gate
         self.requests: list[ChatRequest] = []
@@ -94,6 +96,7 @@ def test_health_info_and_chat() -> None:
         assert body["references"] == [
             {"text": "SB 1.1.1", "ref": "SB 1.1.1", "valid": True},
             {"text": "SB 13.1.1", "ref": None, "valid": False},  # canto 13 does not exist
+            {"text": "SB 1.1.99", "ref": None, "valid": False},  # chapter 1.1 has 23 verses
         ]
         assert body["usage"]["completion_tokens"] == 12 and body["finish_reason"] == "stop"
 
@@ -108,7 +111,7 @@ def test_streaming_events() -> None:
         assert events[0] == {"type": "start"}
         assert [e["text"] for e in events if e["type"] == "delta"] == CHUNKS
         done = events[-1]
-        assert done["type"] == "done" and [r["valid"] for r in done["references"]] == [True, False]
+        assert done["type"] == "done" and [r["valid"] for r in done["references"]] == [True, False, False]
 
 
 @pytest.mark.parametrize(

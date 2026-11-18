@@ -9,8 +9,8 @@ validation through another.
 from __future__ import annotations
 
 import random
-from collections import defaultdict
-from collections.abc import Iterable, Mapping
+from collections import Counter, defaultdict
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal
 
@@ -65,4 +65,89 @@ def leakage_report(train: Mapping[str, str], val: Mapping[str, str], cfg: DedupC
         "exact_examples": exact_cross[:20],
         "near_duplicate_pairs": len(near),
         "near_examples": [{"train": n.a, "val": n.b, "jaccard": n.jaccard} for n in near[:20]],
+    }
+
+
+def equivalence_groups(texts: Mapping[str, str], cfg: DedupConfig) -> list[list[str]]:
+    """Keys whose texts are identical or near-identical, grouped transitively (union-find)."""
+    parent = {key: key for key in texts}
+
+    def find(key: str) -> str:
+        while parent[key] != key:
+            parent[key] = parent[parent[key]]
+            key = parent[key]
+        return key
+
+    for group in exact_duplicates(texts):
+        for key in group[1:]:
+            parent[find(key)] = find(group[0])
+    for pair in near_duplicates(texts, cfg):
+        parent[find(pair.b)] = find(pair.a)
+    groups: dict[str, list[str]] = defaultdict(list)
+    for key in texts:
+        groups[find(key)].append(key)
+    return sorted(sorted(g) for g in groups.values() if len(g) > 1)
+
+
+def _chapter_of(ref_key: str) -> tuple[int, int]:
+    canto, chapter, *_ = (int(x) for x in ref_key.split("."))
+    return canto, chapter
+
+
+def decontaminate(
+    train: Sequence[Mapping[str, Any]],
+    val: Sequence[Mapping[str, Any]],
+    cfg: DedupConfig,
+    *,
+    equivalent_refs: Iterable[Sequence[str]] = (),
+    is_train: Callable[[int, int], bool],
+) -> tuple[list[Mapping[str, Any]], list[dict[str, Any]]]:
+    """Drop validation rows that the training split already teaches.
+
+    A row leaves validation when (a) its verse belongs to an equivalence group (the edition repeats the
+    verse elsewhere) that has a member in a training chapter - this holds across languages, since every
+    translation of a repeated verse renders the same Sanskrit - or (b) its text is an exact or near
+    duplicate of a training row. Training rows are never dropped: the model should still learn every
+    verse. Returns ``(kept_val_rows, removed)``.
+    """
+    leaked_refs: set[str] = set()
+    for group in equivalent_refs:
+        if any(is_train(*_chapter_of(ref)) for ref in group):
+            leaked_refs.update(ref for ref in group if not is_train(*_chapter_of(ref)))
+    removed: list[dict[str, Any]] = []
+    kept: list[Mapping[str, Any]] = []
+    for row in val:
+        if row["ref_key"] in leaked_refs:
+            removed.append(
+                {"record_id": row["record_id"], "ref": row["ref"], "reason": "equivalent_verse_in_train"}
+            )
+        else:
+            kept.append(row)
+    train_texts = {str(r["record_id"]): str(r["text"]) for r in train}
+    val_texts = {str(r["record_id"]): str(r["text"]) for r in kept}
+    combined = {f"t|{k}": v for k, v in train_texts.items()} | {f"v|{k}": v for k, v in val_texts.items()}
+    contaminated = {
+        key[2:]
+        for group in exact_duplicates(combined)
+        if any(k.startswith("t|") for k in group)
+        for key in group
+        if key.startswith("v|")
+    }
+    contaminated |= {pair.b for pair in near_duplicates(train_texts, cfg, cross=val_texts)}
+    final: list[Mapping[str, Any]] = []
+    for row in kept:
+        if row["record_id"] in contaminated:
+            removed.append(
+                {"record_id": row["record_id"], "ref": row["ref"], "reason": "text_duplicate_in_train"}
+            )
+        else:
+            final.append(row)
+    return final, removed
+
+
+def summarize_removed(removed: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    return {
+        "removed_from_val": len(removed),
+        "by_reason": dict(Counter(str(r["reason"]) for r in removed)),
+        "examples": [dict(r) for r in removed[:20]],
     }

@@ -12,7 +12,9 @@ QUOTES: Final = {"‘": "'", "’": "'", "‚": "'", "‛": "'", "′": "'", "�
 # Devanagari, where they control conjunct rendering.
 _INVISIBLE: Final = re.compile("[­\u200b⁠﻿]")
 _LATIN_JOINERS: Final = re.compile("[‌‍]")
-_CONTROL: Final = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]")
+# C0 controls only. C1 (U+0080-U+009F) is left in place: it signals mis-decoded UTF-8, which
+# validation must catch (CONTROL_CHARS), so it is never silently replaced here.
+_CONTROL: Final = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 _SPACES: Final = re.compile(r"[ \t  -   　]+")
 # UTF-8 text decoded as Latin-1/CP1252 ("â€™", "Ã¡"...).
 MOJIBAKE: Final = re.compile(r"(?:Ã[\x80-\xbfa-zA-Z]|â€|Â[\x80-\xbf ])")
@@ -44,5 +46,24 @@ def clean_latin_text(text: str, *, straighten_quotes: bool = True) -> str:
     return collapse_whitespace(text)
 
 
+# A lead byte of a multi-byte UTF-8 sequence decoded as cp1252/latin-1 ("á", "Å", "Ä"...) followed by
+# continuation bytes (U+0080-U+00BF or their cp1252 renderings).
+_SUSPECT: Final = re.compile(
+    "[\u00c0-\u00ff][\u0080-\u00bf\u0152\u0153\u0160\u0161\u0178\u017d\u017e\u0192\u02c6\u02dc"
+    "\u2013\u2014\u2018-\u201e\u2020-\u2022\u2026\u2030\u2039\u203a\u20ac\u2122]+"
+)
+
+
 def has_mojibake(text: str) -> bool:
-    return MOJIBAKE.search(text) is not None
+    """True when the text contains UTF-8 that was decoded as cp1252 or latin-1 (e.g. "Ká¹›á¹£á¹‡a")."""
+    if "\ufffd" in text or MOJIBAKE.search(text):
+        return True
+    for match in _SUSPECT.finditer(text):
+        segment = match.group(0)
+        for encoding in ("cp1252", "latin-1"):
+            try:
+                if segment.encode(encoding).decode("utf-8") != segment:
+                    return True
+            except (UnicodeEncodeError, UnicodeDecodeError):
+                continue
+    return False

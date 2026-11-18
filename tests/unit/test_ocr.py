@@ -48,7 +48,9 @@ def test_running_heads_need_enough_pages() -> None:
 
 
 def test_dehyphenate_uses_corpus_evidence() -> None:
-    vocab = Counter({"bhagavatam": 5, "srimad-bhagavatam": 3, "devotion": 4})
+    vocab = build_vocabulary(
+        ["the bhagavatam and the bhagavatam", "Srimad-Bhagavatam Srimad-Bhagavatam", "devotion"]
+    )
     stats = DehyphenationStats()
     lines = [
         "the Bhaga-",
@@ -76,3 +78,16 @@ def test_build_vocabulary_ignores_line_end_fragments() -> None:
 
 def test_unwrap_paragraphs() -> None:
     assert unwrap_paragraphs(["a b", "c", "", "d", "", "", "e"]) == ["a b c", "d", "e"]
+
+
+def test_dehyphenate_handles_consecutive_broken_lines() -> None:
+    vocab = build_vocabulary(["the bhagavatam was composed by vyasa"])
+    lines = ["The Bhaga-", "vatam was com-", "posed by Vyasa"]
+    assert dehyphenate(lines, vocab) == ["The Bhagavatam was composed by Vyasa"]
+
+
+def test_vocabulary_counts_hyphenated_forms_and_keeps_attested_compounds() -> None:
+    text = "co-operate co-operate co-operate co-operate co-operate\ncooperate"
+    vocab = build_vocabulary([text])
+    assert vocab["co-operate"] == 5 and vocab["cooperate"] == 1
+    assert dehyphenate(["they will co-", "operate"], vocab) == ["they will co-operate"]

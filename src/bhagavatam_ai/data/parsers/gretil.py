@@ -30,7 +30,7 @@ from typing import Final
 from bhagavatam_ai.data.parsers.base import ParsedDocument, ParsedVerse, ParserError, register
 
 PARSER_NAME: Final = "gretil_tei_bhp"
-PARSER_VERSION: Final = "1.2.0"
+PARSER_VERSION: Final = "1.3.0"
 
 _ID: Final = r"BhP_(?P<c>\d{2})\.(?P<ch>\d{2})\.(?P<v>\d{3})(?:_(?P<part>\d))?"
 _VERSE_END: Final = re.compile(
@@ -127,15 +127,41 @@ def _assign_variants(verses: list[ParsedVerse]) -> int:
     return duplicates
 
 
+def _mark_uncertain_before(verses: list[ParsedVerse], verse: ParsedVerse, label: str) -> None:
+    """A speaker line labelled for an earlier verse of the same chapter: the carried-forward speakers
+    of the verses it should have introduced are probably wrong."""
+    canto, chapter, labelled = (int(x) for x in label.split("."))
+    if (canto, chapter) != (verse.canto, verse.chapter) or labelled >= verse.verse:
+        return
+    for other in verses:
+        if (
+            (other.canto, other.chapter) == (canto, chapter)
+            and labelled <= other.verse < verse.verse
+            and "speaker_carried_forward" in other.flags
+            and "speaker_uncertain" not in other.flags
+        ):
+            other.flags.append("speaker_uncertain")
+
+
 def _carry_speakers(verses: list[ParsedVerse]) -> None:
-    """Propagate the most recent explicit speaker forward within each chapter."""
+    """Propagate the most recent explicit speaker forward within each chapter.
+
+    Carried-forward attributions are inferences (flagged ``speaker_carried_forward``): dialogue that
+    lacks explicit speaker lines makes them wrong at times (e.g. 10.62.15-17). Nothing is carried forward
+    from a speaker line whose verse label disagrees with its position (``speaker_label_mismatch``).
+    """
     current: str | None = None
     chapter: tuple[int, int] | None = None
     for verse in verses:
         if (verse.canto, verse.chapter) != chapter:
             chapter, current = (verse.canto, verse.chapter), None
         if verse.speaker_explicit:
-            current = verse.speaker_raw
+            label = next(
+                (f.split(":", 1)[1] for f in verse.flags if f.startswith("speaker_label_mismatch")), None
+            )
+            if label is not None:
+                _mark_uncertain_before(verses, verse, label)
+            current = None if label is not None else verse.speaker_raw
         elif current is not None:
             verse.speaker_raw = current
             verse.flags.append("speaker_carried_forward")
@@ -200,6 +226,7 @@ class _Reader:
             self.speaker_mismatches.append(
                 f"speaker at line {line} labelled {ident} precedes {verse.locator}"
             )
+            verse.flags.append("speaker_label_mismatch:{}.{}.{}".format(*ident))
         if name:
             verse.speaker_raw, verse.speaker_explicit = name, True
         self.pending_speaker = None

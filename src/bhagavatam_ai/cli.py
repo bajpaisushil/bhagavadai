@@ -229,7 +229,7 @@ def cmd_serve(rt: Runtime) -> int:
     import uvicorn
 
     from bhagavatam_ai.api.app import ApiSettings, create_app
-    from bhagavatam_ai.api.service import TransformersChatService
+    from bhagavatam_ai.api.service import TransformersChatService, load_chapter_lengths
 
     settings = ApiSettings(
         model_config=rt.paths.configs / "model.yaml",
@@ -238,9 +238,11 @@ def cmd_serve(rt: Runtime) -> int:
         cors_origins=rt.args.cors_origin or [],
     )
 
+    lengths = load_chapter_lengths(rt.paths.reference / "expected_structure.json")
+
     def factory() -> TransformersChatService:
         return TransformersChatService(
-            settings.model_config, device=settings.device, adapter=settings.adapter
+            settings.model_config, device=settings.device, adapter=settings.adapter, chapter_lengths=lengths
         )
 
     print(

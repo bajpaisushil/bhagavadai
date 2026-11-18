@@ -61,3 +61,13 @@ def test_find_references_flags_impossible_citations() -> None:
     found = find_references(text)
     assert [m for m, _ in found] == ["SB 1.2.6", "Bhāgavatam 10.14.58", "SB 13.4.2"]
     assert found[0][1] is not None and found[2][1] is None  # canto 13 does not exist
+
+
+def test_find_references_never_truncates_and_checks_chapter_lengths() -> None:
+    found = dict(find_references("SB 1.1.1000, SB 1.100.1, SB 100.1.1 and SB 1.1.23"))
+    assert set(found) == {"SB 1.1.1000", "SB 1.100.1", "SB 100.1.1", "SB 1.1.23"}  # nothing truncated
+    assert found["SB 1.100.1"] is None and found["SB 100.1.1"] is None
+    lengths = {"1.1": 23}
+    checked = dict(find_references("SB 1.1.1000 and SB 1.1.23 and SB 1.1.22-24", lengths))
+    assert checked["SB 1.1.1000"] is None and checked["SB 1.1.22-24"] is None
+    assert str(checked["SB 1.1.23"]) == "SB 1.1.23"
