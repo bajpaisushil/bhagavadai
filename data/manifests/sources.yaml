@@ -419,12 +419,12 @@ sources:
     - Worldwide status unverified (HathiTrust 'pdus')
     - Strip the Project Gutenberg header and footer and trademark
     reviewed_on: '2026-11-18'
-    review_status: researched
+    review_status: adversarially_verified
     commercial_use: unclear
     ml_training: unclear
-    permission_status: under_review
+    permission_status: public_domain
     usage: {}
-    notes: A study with Theosophical interpretation, not a translation. If used, label as interpretation.
+    notes: "Public domain (adversarially verified: published 1901; author P. N. Sinha died c. 1923). A Theosophical study and abridged paraphrase, not a translation: if ever used, label it as interpretation, strip all Project Gutenberg headers and trademark text, and never use it as verse-level ground truth. Not used."
     downloads: []
     original_source_urls: []
   - id: bhaktiratnavali-1912
@@ -455,12 +455,12 @@ sources:
     - Citations are inconsistent, so verse IDs must be recovered by alignment
     - Partial, thematic selection
     reviewed_on: '2026-11-18'
-    review_status: researched
+    review_status: adversarially_verified
     commercial_use: unclear
     ml_training: unclear
-    permission_status: under_review
+    permission_status: public_domain
     usage: {}
-    notes: Anthology of Bhagavata verses with Visnu Puri's commentary (Sacred Books of the Hindus vol. VII).
+    notes: "Public domain (adversarially verified: 1912, anonymous translator). An anthology of Bhagavata verses with Visnu Puri's commentary. The scanned volume also contains other works (Narada and Sandilya Bhakti Sutras), which must be cut away; Devanagari OCR is unusable. Not used."
     downloads: []
     original_source_urls: []
   - id: eastwick-1851-prem-sagar
